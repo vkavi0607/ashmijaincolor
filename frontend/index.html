@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior:smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ashmija in color | Premium Custom Murals & Hand-Painted Wall Art</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description"
+    content="ashmija in color connects spaces and brands with South Asia's premium mural artists. We curate, manage, and craft hand-painted murals and custom wall art.">
+  <meta name="keywords"
+    content="mural studio, custom murals, hand-painted walls, street art India, mural artists Chennai, office wall art, commercial mural design">
+  <meta name="author" content="ashmija in color">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Tabler Icons CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+
+  <!-- Local Stylesheet -->
+  <link rel="stylesheet" href="./css/style.css?v=20260708-1">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./assets/images/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/logo.png">
+
+  <!-- Local scripts (deferred) -->
+  <script src="./js/shared/config.js?v=2" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="./js/shared/supabase-client.js?v=1" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Flip.min.js"></script>
+  <script src="./js/public/script.js?v=20260711-1" defer></script>
+  <script src="./js/public/portfolio-public.js?v=20260709-4" defer></script>
+  <script src="./js/public/artists-public.js?v=20260709-4" defer></script>
+  <script src="./js/public/faqs-public.js?v=20260709-4" defer></script>
+  <script src="./js/public/config-public.js?v=20260711-1" defer></script>
+  <script src="./js/shared/data-loader.js?v=20260629-1" defer></script>
+  <script src="./admin/js/toast.js?v=20260711-1" defer></script>
+  <script src="./admin/js/inquiries.js?v=20260711-1" defer></script>
+</head>
+
+<body>
+
+  <div id="scroll-progress-bar" class="scroll-progress-bar" aria-hidden="true">
+    <div class="scroll-progress-fill"></div>
+  </div>
+
+  <!-- Header Navigation -->
+  <header>
+    <nav>
+      <div class="nav-logo">
+        <a href="#hero-section" class="logo-link">
+          <img src="./assets/images/logo.png" alt="ashmija in color logo" class="nav-logo-img">
+          <span class="logo-text">Ashmija <span>in color</span></span>
+        </a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#portfolio-section" id="nav-link-gallery">Creations</a></li>
+        <li><a href="#artists-section" id="nav-link-artists">Artists</a></li>
+        <li><a href="#why-us-section" id="nav-link-projects">Why Us</a></li>
+        <li><a href="#testimonials-section" id="nav-link-testimonials">Reviews</a></li>
+        <li><a href="#contact-section" id="nav-link-contact">Connect</a></li>
+        <li><a href="#about-section" id="nav-link-about">Story</a></li>
+        <li><a href="#faq-section" id="nav-link-faq">FAQ</a></li>
+      </ul>
+
+      <!-- Hamburger Menu Toggle Button -->
+      <button class="nav-hamburger" id="nav-hamburger-toggle" aria-label="Toggle Navigation Menu" aria-expanded="false">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
+      <button class="nav-btn" id="btn-book-artist"
+        onclick="document.getElementById('contact-section').scrollIntoView({behavior:'smooth'})">Let's Talk</button>
+    </nav>
+  </header>
+
+  <!-- Mobile Navigation Slide-out Overlay -->
+  <div id="mobile-menu-overlay" class="mobile-menu-overlay" aria-hidden="true">
+    <button class="mobile-menu-close" id="mobile-menu-close-btn" aria-label="Close Navigation Menu">&times;</button>
+    <nav class="mobile-menu-nav">
+      <ul class="mobile-nav-links">
+        <li><a href="#portfolio-section" class="mobile-nav-link">Creations</a></li>
+        <li><a href="#artists-section" class="mobile-nav-link">Artists</a></li>
+        <li><a href="#why-us-section" class="mobile-nav-link">Why Us</a></li>
+        <li><a href="#testimonials-section" class="mobile-nav-link">Reviews</a></li>
+        <li><a href="#contact-section" class="mobile-nav-link">Connect</a></li>
+        <li><a href="#about-section" class="mobile-nav-link">Story</a></li>
+        <li><a href="#faq-section" class="mobile-nav-link">FAQ</a></li>
+      </ul>
+      <button class="nav-btn" id="btn-mobile-book-artist"
+        onclick="document.getElementById('contact-section').scrollIntoView({behavior:'smooth'}); document.getElementById('mobile-menu-overlay').classList.remove('active'); document.getElementById('nav-hamburger-toggle').classList.remove('active'); document.getElementById('nav-hamburger-toggle').setAttribute('aria-expanded', 'false'); document.body.style.overflow = '';">Let's
+        Talk</button>
+    </nav>
+  </div>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero" id="hero-section">
+      <!-- Background overlays -->
+      <div class="hero-mural" aria-hidden="true"></div>
+      <div class="hero-spotlight" aria-hidden="true"></div>
+      <div class="hero-sunlight" aria-hidden="true"></div>
+      <div class="hero-vignette" aria-hidden="true"></div>
+      <div class="hero-grain" aria-hidden="true"></div>
+
+      <!-- Floating leaves -->
+      <svg class="hero-floating-leaf leaf-1" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true">
+        <path d="M10 90 Q 50 80 60 40 Q 70 0 90 10 Q 50 30 40 60 Q 30 80 10 90 Z" fill="currentColor" />
+      </svg>
+      <svg class="hero-floating-leaf leaf-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true">
+        <path d="M90 90 Q 50 80 40 40 Q 30 0 10 10 Q 50 30 60 60 Q 70 80 90 90 Z" fill="currentColor" />
+      </svg>
+      <svg class="hero-floating-leaf leaf-3" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true">
+        <path d="M10 10 Q 50 20 60 60 Q 70 100 90 90 Q 50 70 40 40 Q 30 20 10 10 Z" fill="currentColor" />
+      </svg>
+      <svg class="hero-floating-leaf leaf-4" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true">
+        <path d="M90 10 Q 50 20 40 60 Q 30 100 10 90 Q 50 70 60 40 Q 70 20 90 10 Z" fill="currentColor" />
+      </svg>
+
+      <!-- Center content card -->
+      <div class="hero-content-card reveal">
+        <div class="hero-eyebrow">✦ Premium Mural Studio</div>
+        <h1 class="hero-title">Curating Walls,<br><em>Crafting Ambience.</em></h1>
+        <p class="hero-sub">We transform blank walls into immersive art experiences — connecting brands and spaces with
+          South Asia's finest mural artists.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" id="btn-hero-explore"
+            onclick="document.getElementById('portfolio-section').scrollIntoView({behavior:'smooth'})">Explore
+            Gallery</button>
+          <button class="btn-outline" id="btn-hero-artists"
+            onclick="document.getElementById('artists-section').scrollIntoView({behavior:'smooth'})">Meet Artists
+            →</button>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat-item">
+            <div class="hero-stat-num" data-target="750" data-suffix="k+">0</div>
+            <div class="hero-stat-label">Sq. ft. painted</div>
+          </div>
+          <div class="hero-stat-divider" aria-hidden="true"></div>
+          <div class="hero-stat-item">
+            <div class="hero-stat-num" data-target="2900" data-suffix="+" data-comma="true">0</div>
+            <div class="hero-stat-label">Projects done</div>
+          </div>
+          <div class="hero-stat-divider" aria-hidden="true"></div>
+          <div class="hero-stat-item">
+            <div class="hero-stat-num" data-target="38" data-suffix="+">0</div>
+            <div class="hero-stat-label">Cities</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Band -->
+    <div class="cta-band" id="cta-section">
+      <div class="cta-inner reveal">
+        <div class="cta-glow"></div>
+        <h2>Ready to transform your<br><em>wall today?</em></h2>
+        <p>Join 3,000+ happy clients who turned blank walls into unforgettable brand experiences.</p>
+        <div class="cta-btns">
+          <button class="cta-btn-primary" id="btn-cta-start"
+            onclick="document.getElementById('contact-section').scrollIntoView({behavior:'smooth'})">Start Your
+            Project</button>
+          <button class="cta-btn-outline" id="btn-cta-portfolio"
+            onclick="document.getElementById('portfolio-section').scrollIntoView({behavior:'smooth'})">View Portfolio
+            →</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Portfolio Section Redesigned as 3D Museum Gallery -->
+    <section id="portfolio-section" class="museum-gallery-section">
+      <div class="gallery-ambient-glow"></div>
+
+      <div class="gallery-container">
+        <!-- Section Header -->
+        <div class="works-header reveal" style="margin-bottom: 2rem;">
+          <div>
+            <span class="gallery-kicker">✦ Immersive Exhibition</span>
+            <h2 class="sec-title" style="color: var(--ink);">The 3D Gallery</h2>
+          </div>
+        </div>
+
+        <!-- Category Navigation -->
+        <div class="gallery-categories-nav">
+          <button class="gallery-cat-btn active" data-category="corporate">
+            <span class="btn-text">Corporate Offices</span>
+            <span class="glow-accent"></span>
+          </button>
+          <button class="gallery-cat-btn" data-category="cafes">
+            <span class="btn-text">Cafés & Restaurants</span>
+            <span class="glow-accent"></span>
+          </button>
+          <button class="gallery-cat-btn" data-category="schools">
+            <span class="btn-text">Schools & Education</span>
+            <span class="glow-accent"></span>
+          </button>
+          <button class="gallery-cat-btn" data-category="hospitals">
+            <span class="btn-text">Hospitals & Clinics</span>
+            <span class="glow-accent"></span>
+          </button>
+          <button class="gallery-cat-btn" data-category="hotels">
+            <span class="btn-text">Hotels & Resorts</span>
+            <span class="glow-accent"></span>
+          </button>
+          <button class="gallery-cat-btn" data-category="residential">
+            <span class="btn-text">Residential Interiors</span>
+            <span class="glow-accent"></span>
+          </button>
+          <button class="gallery-cat-btn" data-category="outdoor">
+            <span class="btn-text">Outdoor & Public Art</span>
+            <span class="glow-accent"></span>
+          </button>
+        </div>
+
+        <!-- 3D Exhibition Room (Hero Showcase) -->
+        <div class="gallery-3d-room">
+          <!-- Left: 3D Artwork Viewer -->
+          <div class="gallery-artwork-showcase">
+            <div class="artwork-3d-wrapper">
+              <div class="artwork-3d-card" id="interactive-3d-frame">
+                <div class="glass-reflection"></div>
+                <img id="featured-artwork-img"
+                  src="https://images.unsplash.com/photo-1549887552-cb1071d3e5ca?auto=format&fit=crop&w=800&q=80"
+                  alt="Featured Artwork" class="gallery-featured-img">
+                <div class="artwork-glow-accent"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Premium Info Card -->
+          <div class="gallery-info-showcase">
+            <div class="glassmorphism-card info-card">
+              <span class="artwork-category-tag" id="artwork-tag">Paintings</span>
+              <h3 class="artwork-title" id="artwork-title">Loading...</h3>
+              <p class="artwork-artist-line"><span class="artwork-artist" id="artwork-artist">Loading...</span></p>
+
+              <div class="artwork-specs">
+                <div class="spec-item">
+                  <span class="spec-label">Medium</span>
+                  <span class="spec-val" id="artwork-medium">Loading...</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Year</span>
+                  <span class="spec-val" id="artwork-year">Loading...</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Dimensions</span>
+                  <span class="spec-val" id="artwork-dims">Loading...</span>
+                </div>
+              </div>
+
+              <p class="artwork-description" id="artwork-desc">Loading...</p>
+
+              <button class="btn-primary btn-explore-collection" id="btn-explore-gallery"
+                style="margin-top: 1.5rem; width: 100%;"
+                onclick="document.getElementById('coverflow-carousel').scrollIntoView({ behavior: 'smooth' })">
+                <span>Explore Collection</span>
+                <i class="ti ti-arrow-up-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Artwork Carousel -->
+        <div class="gallery-carousel-wrapper">
+          <h4 class="carousel-section-title">Exhibition Catalogue</h4>
+          <div class="carousel-container" id="coverflow-carousel">
+            <div class="carousel-track" id="carousel-track">
+              <!-- Carousel cards populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fullscreen 3D Lightbox Viewer -->
+    <div id="gallery-lightbox" class="gallery-lightbox" hidden>
+      <button class="lightbox-close" aria-label="Close Lightbox">&times;</button>
+      <div class="lightbox-content">
+        <div class="lightbox-frame-wrapper">
+          <div class="lightbox-frame" id="lightbox-3d-frame">
+            <div class="lightbox-face face-front">
+              <img id="lightbox-img" src="" alt="Fullscreen artwork">
+              <div class="glass-reflection"></div>
+            </div>
+            <div class="lightbox-face face-back"></div>
+            <div class="lightbox-face face-left"></div>
+            <div class="lightbox-face face-right"></div>
+            <div class="lightbox-face face-top"></div>
+            <div class="lightbox-face face-bottom"></div>
+          </div>
+        </div>
+        <div class="lightbox-info-overlay">
+          <h3 id="lightbox-artwork-title">Title</h3>
+          <p id="lightbox-artwork-artist">Artist</p>
+          <div class="lightbox-angles" id="lightbox-angles-nav">
+            <button class="angle-btn active" data-angle="front"><i class="ti ti-camera"></i> Front</button>
+            <button class="angle-btn" data-angle="left"><i class="ti ti-arrow-left"></i> Left Angle</button>
+            <button class="angle-btn" data-angle="right"><i class="ti ti-arrow-right"></i> Right Angle</button>
+            <button class="angle-btn" data-angle="wide"><i class="ti ti-maximize"></i> Wide Space</button>
+            <button class="angle-btn" data-angle="close"><i class="ti ti-zoom-in"></i> Close-up</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials-section" class="testimonials-section">
+      <!-- Decorative 3D Ambient Blobs -->
+      <div class="testimonial-blob blob-1" aria-hidden="true"></div>
+      <div class="testimonial-blob blob-2" aria-hidden="true"></div>
+
+      <div class="reveal" style="text-align:center;margin-bottom: 2rem; position: relative; z-index: 2;">
+        <span class="gallery-kicker">✦ Client Experiences</span>
+        <h2 class="sec-title" style="color: var(--ink);">What Our Clients Say</h2>
+        <p class="sec-sub" style="max-width:440px;margin:.4rem auto 0">Trusted by top corporate spaces, luxury estates,
+          and public installations</p>
+      </div>
+
+      <div class="testimonials-3d-carousel-container reveal">
+        <!-- Navigation Arrows -->
+        <button class="carousel-3d-btn prev-btn" id="testimonial-prev-btn" aria-label="Previous Testimonial">
+          <i class="ti ti-chevron-left"></i>
+        </button>
+
+        <div class="testimonials-3d-viewport" id="testimonials-3d-viewport">
+          <div class="testimonial-spotlight" aria-hidden="true"></div>
+          <div class="testimonials-3d-track" id="testimonials-3d-track">
+            <!-- Testimonial cards populated dynamically by JS -->
+          </div>
+        </div>
+
+        <button class="carousel-3d-btn next-btn" id="testimonial-next-btn" aria-label="Next Testimonial">
+          <i class="ti ti-chevron-right"></i>
+        </button>
+      </div>
+
+      <!-- Pagination Dots -->
+      <div class="testimonials-3d-dots-container reveal">
+        <div class="testimonials-3d-dots" id="testimonials-3d-dots"></div>
+      </div>
+
+      <div class="testimonial-rate-wrap reveal"
+        style="margin-top: 3rem; display: flex; gap: 1rem; justify-content: center;">
+        <button type="button" class="btn-secondary-outline" id="view-all-reviews-btn">View More Reviews</button>
+        <button type="button" class="btn-secondary" id="rate-us-btn">Rate Us</button>
+      </div>
+    </section>
+
+    <div id="review-ml-reply-card" class="review-ml-reply-card glass-card" hidden>
+      <div class="reply-card-heading">AI-generated reply</div>
+      <div class="reply-card-body">Your custom reply will appear here after review submission.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Artists Section -->
+    <section class="artists-bg" id="artists-section" style="padding:5.5rem 2.5rem">
+      <div class="foliage-decor decor-right-leaves" aria-hidden="true"></div>
+
+      <div class="creators-header reveal">
+        <div class="creators-header-left">
+          <h2 class="sec-title-main">Meet The Team</h2>
+          <h3 class="sec-title-sub">Our Professionals</h3>
+          <div class="accent-line"></div>
+        </div>
+        <div class="creators-header-right">
+          <p class="creators-lead-desc">Our team of visionary artists blends architectural knowledge with visual
+            storytelling. From large-scale exterior murals to intricate indoor spaces, we bring walls to life with
+            precision and passion.</p>
+          <button class="btn-read-more" id="btn-creators-more">READ MORE</button>
+        </div>
+      </div>
+
+      <div class="creators-grid-new">
+        <!-- Creator 1: Vikram -->
+        <div class="creator-card flip-card reveal" style="transition-delay:.1s">
+          <div class="flip-card-inner">
+            <!-- Front Face -->
+            <div class="flip-card-front">
+              <div class="creator-card-img">
+                <img src="./assets/artists/vikram-profile.jpg" class="creator-raw-img" style="--photo-pos:center 12%;"
+                  alt="Vikram">
+              </div>
+            </div>
+            <!-- Back Face -->
+            <div class="flip-card-back glass-card">
+              <div class="creator-card-back-info">
+                <span class="creator-role-badge">Lead Artist, Urban & Abstract</span>
+                <h3 class="creator-name-title">VIKRAM</h3>
+                <p class="creator-bio-text">Specializing in geometric abstraction and large-scale urban realism, Vikram
+                  has spent the last 12 years collaborating with corporate campuses, hospitality interiors, and public
+                  districts to transform blank walls into local landmarks.</p>
+                <blockquote class="creator-quote-text">"Art should not be confined behind closed doors. Corporate
+                  corridors and public walls are the spaces where street realism and daily life truly merge."
+                </blockquote>
+                <div class="creator-stats-wrap">
+                  <span class="creator-stat-badge">✦ Featured in Elle Décor</span>
+                  <span class="creator-stat-badge">✦ 80+ Projects</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Creator 2: Ashmija -->
+        <div class="creator-card flip-card reveal" style="transition-delay:.2s">
+          <div class="flip-card-inner">
+            <!-- Front Face -->
+            <div class="flip-card-front">
+              <div class="creator-card-img">
+                <img src="./assets/artists/ashmija-profile.jpg" class="creator-raw-img" style="--photo-pos:center 18%;"
+                  alt="Ashmija">
+              </div>
+            </div>
+            <!-- Back Face -->
+            <div class="flip-card-back glass-card">
+              <div class="creator-card-back-info">
+                <span class="creator-role-badge">Lead Artist, Muralist</span>
+                <h3 class="creator-name-title">ASHMIJA</h3>
+                <p class="creator-bio-text">Merging intricate botanical illustrations with architectural backdrops,
+                  Ashmija's nature-inspired murals and large-scale floral art pieces bring organic life and a sense of
+                  calm to high-end interiors across South Asia.</p>
+                <blockquote class="creator-quote-text">"My work bridges the gap between concrete rooms and the wild
+                  serenity of nature. I paint to give blank walls a voice and spaces a heartbeat."</blockquote>
+                <div class="creator-stats-wrap">
+                  <span class="creator-stat-badge">✦ 120+ Murals</span>
+                  <span class="creator-stat-badge">✦ National Art Award</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+
+    <!-- Stats Band -->
+    <div class="stats-band" id="stats-band">
+      <div class="stats-band-inner reveal">
+        <div class="stat-item">
+          <div class="stat-num" data-target="750000" data-suffix="k+">750k+</div>
+          <div class="stat-label">Sq. ft. of walls painted</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="2900" data-suffix="+">2,900+</div>
+          <div class="stat-label">Projects delivered</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="3000" data-suffix="+">3,000+</div>
+          <div class="stat-label">Happy clients</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="38" data-suffix="+">38+</div>
+          <div class="stat-label">Cities across India</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why Us Section -->
+    <section id="why-us-section" style="padding:4.5rem 2.5rem">
+      <div class="foliage-decor decor-left-monstera" aria-hidden="true"></div>
+      <div class="reveal" style="text-align:center;margin-bottom:0">
+        <div class="sec-label" style="display:flex;justify-content:center">Why us</div>
+        <h2 class="sec-title">Why Clients Choose Us</h2>
+        <p class="sec-sub" style="max-width:440px;margin:.4rem auto 0">End-to-end art experiences backed by expertise
+          and passion</p>
+      </div>
+      <div class="why-grid reveal" style="transition-delay:.1s">
+        <div class="why-card glass-subtle">
+          <div class="why-icon-wrap"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+          <h4>Site Assessment</h4>
+          <p>On-ground evaluation of surface, lighting, and architecture before a single brushstroke begins.</p>
+        </div>
+        <div class="why-card glass-subtle">
+          <div class="why-icon-wrap"><i class="ti ti-sparkles" aria-hidden="true"></i></div>
+          <h4>Personalised Design</h4>
+          <p>Bespoke concept development and mood boards tailored to your brand identity and space story.</p>
+        </div>
+        <div class="why-card glass-subtle">
+          <div class="why-icon-wrap"><i class="ti ti-trending-up" aria-hidden="true"></i></div>
+          <h4>Positive Return on Art</h4>
+          <p>Clients report higher footfall, stronger social engagement and elevated brand perception post-mural.</p>
+        </div>
+        <div class="why-card glass-subtle">
+          <div class="why-icon-wrap"><i class="ti ti-timeline" aria-hidden="true"></i></div>
+          <h4>End-to-End Management</h4>
+          <p>Permits, logistics, installation and aftercare — all handled seamlessly with zero fuss for you.</p>
+        </div>
+        <div class="why-card glass-subtle">
+          <div class="why-icon-wrap"><i class="ti ti-color-swatch" aria-hidden="true"></i></div>
+          <h4>Premium Materials</h4>
+          <p>UV-resistant, eco-certified paints ensuring murals that look stunning for 10+ years outdoors.</p>
+        </div>
+        <div class="why-card glass-subtle">
+          <div class="why-icon-wrap"><i class="ti ti-camera" aria-hidden="true"></i></div>
+          <h4>Pro Photography</h4>
+          <p>Every project ends with a professional photoshoot — portfolio-ready and social-ready imagery.</p>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- Contact Us Section -->
+    <section id="contact-section" style="padding:4.5rem 2.5rem">
+      <div class="contact-section-grid reveal">
+        <div class="contact-info-side">
+          <div class="sec-label">Get in Touch</div>
+          <h2 class="sec-title">Contact Us</h2>
+          <p class="sec-sub" style="max-width:380px;margin-top:.6rem">Have a project in mind? Let's bring your walls to
+            life. Reach out and our team will get back within 24 hours.</p>
+          <div class="contact-social-links" aria-label="Contact links">
+            <a href="https://www.instagram.com/ashmija_in_color?igsh=NzhrbGJvaWVhMTJ3" class="social-icon instagram"
+              aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+              <i class="ti ti-brand-instagram"></i>
+            </a>
+            <a href="https://www.facebook.com/share/1JFvUQGTUA/" class="social-icon facebook" aria-label="Facebook"
+              target="_blank" rel="noopener noreferrer">
+              <i class="ti ti-brand-facebook"></i>
+            </a>
+            <a href="https://www.linkedin.com/company/ashmija-in-color/" class="social-icon linkedin"
+              aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+              <i class="ti ti-brand-linkedin"></i>
+            </a>
+            <a href="https://www.youtube.com/@ashmijaincolor?si=25sBeIsKtHnvtQ5w" class="social-icon youtube"
+              aria-label="YouTube" target="_blank" rel="noopener noreferrer">
+              <i class="ti ti-brand-youtube"></i>
+            </a>
+            <a href="tel:+918870120750" class="social-icon phone" aria-label="Call us">
+              <i class="ti ti-phone-call"></i>
+            </a>
+            <a href="mailto:ashmijaincolor@gmail.com" class="social-icon email" aria-label="Email us">
+              <i class="ti ti-mail"></i>
+            </a>
+          </div>
+
+
+
+
+
+        </div>
+        <div class="contact-form-side glass-card" style="padding:2.2rem; position: relative; min-height: 450px;">
+
+          <!-- Success State (Hidden by default) -->
+          <div id="contact-success-state" style="display:none; flex-direction:column; align-items:center; justify-content:center; height: 100%; min-height: 350px; text-align:center;">
+            <div class="handshake-3d" style="font-size: 6rem; margin-bottom: 1.5rem; display: inline-block; transform-style: preserve-3d; animation: shake3d 1.5s infinite ease-in-out alternate;">🤝</div>
+            <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; color:var(--ink); margin-bottom: 0.5rem;">Thank You!</h3>
+            <p style="font-size:0.95rem; color:var(--muted); line-height:1.6; max-width: 250px; margin: 0 auto;">Your message was sent successfully. We'll be in touch soon.</p>
+            <style>
+              @keyframes shake3d {
+                0% { transform: perspective(500px) rotateY(-25deg) rotateZ(-5deg) scale(1); }
+                50% { transform: perspective(500px) rotateY(25deg) rotateZ(5deg) scale(1.15); }
+                100% { transform: perspective(500px) rotateY(-25deg) rotateZ(-5deg) scale(1); }
+              }
+            </style>
+          </div>
+
+          <!-- Form Container -->
+          <div id="contact-form-container">
+            <h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;margin-bottom:.3rem;color:var(--ink)">Send Us a Message</h3>
+            <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.5">We'd love to hear about your vision</p>
+            <form id="contact-section-form" onsubmit="event.preventDefault();">
+            <div class="form-row">
+              <div>
+                <label class="form-label" for="contact-first-name">First name</label>
+                <input class="form-input" type="text" id="contact-first-name" placeholder="Arjun" required>
+              </div>
+              <div>
+                <label class="form-label" for="contact-last-name">Last name</label>
+                <input class="form-input" type="text" id="contact-last-name" placeholder="Sharma" required>
+              </div>
+            </div>
+            <label class="form-label" for="contact-email">Email</label>
+            <input class="form-input" type="email" id="contact-email" placeholder="hello@example.com" required>
+            <label class="form-label" for="contact-phone">Phone</label>
+            <input class="form-input" type="tel" id="contact-phone" placeholder="+91 98765 43210">
+            <label class="form-label" for="contact-project-type">Project type</label>
+            <select class="form-input" id="contact-project-type">
+              <option>Corporate Offices</option>
+              <option>Cafes & Restaurants</option>
+              <option>Schools & Education</option>
+              <option>Hospitals & Clinics</option>
+              <option>Hotels & Resorts</option>
+              <option>Residential Interiors</option>
+              <option>Outdoor & Public Art</option>
+            </select>
+            <label class="form-label" for="contact-message">Your message</label>
+            <textarea class="form-input" id="contact-message" rows="4" placeholder="Describe your wall idea..."
+              style="resize:vertical"></textarea>
+            <button class="form-submit" id="btn-contact-submit" type="submit">Send Message →</button>
+          </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- About Us Section -->
+    <section id="about-section" style="padding:4.5rem 2.5rem">
+      <div class="foliage-decor decor-right-banana" aria-hidden="true"></div>
+      <div class="about-grid reveal">
+        <div class="about-content">
+          <div class="sec-label">Our Story</div>
+          <h2 class="sec-title">About ashmija in color</h2>
+          <p class="sec-sub" style="max-width:500px;margin-top:.8rem">Founded in 2026 in Kallakurichi, ashmija in color
+            began
+            with a simple belief — every wall is a canvas waiting to tell a story. What started as a passion project by
+            a small group of mural enthusiasts has grown into South Asia's most trusted mural art studio.</p>
+          <p class="sec-sub" style="max-width:500px;margin-top:1rem">We've painted over 750,000 sq. ft. across 38+
+            cities, partnering with brands like Google, WeWork, Taj Hotels, and ITC to transform ordinary spaces into
+            extraordinary experiences. Our curated network of 120+ artists specialises in everything from botanical
+            murals to abstract installations.</p>
+          <div class="about-values">
+            <div class="about-value-item glass-subtle">
+              <div class="why-icon-wrap"><i class="ti ti-heart" aria-hidden="true"></i></div>
+              <div>
+                <h4
+                  style="font-family:'Playfair Display',serif;font-size:.92rem;font-weight:400;color:var(--ink);margin-bottom:.2rem">
+                  Passion-Driven</h4>
+                <p style="font-size:.75rem;color:var(--muted);line-height:1.5;font-weight:300">Every project is treated
+                  as a work of art, not just a job.</p>
+              </div>
+            </div>
+            <div class="about-value-item glass-subtle">
+              <div class="why-icon-wrap"><i class="ti ti-users" aria-hidden="true"></i></div>
+              <div>
+                <h4
+                  style="font-family:'Playfair Display',serif;font-size:.92rem;font-weight:400;color:var(--ink);margin-bottom:.2rem">
+                  Community First</h4>
+                <p style="font-size:.75rem;color:var(--muted);line-height:1.5;font-weight:300">We empower local artists
+                  and invest in emerging talent.</p>
+              </div>
+            </div>
+            <div class="about-value-item glass-subtle">
+              <div class="why-icon-wrap"><i class="ti ti-leaf" aria-hidden="true"></i></div>
+              <div>
+                <h4
+                  style="font-family:'Playfair Display',serif;font-size:.92rem;font-weight:400;color:var(--ink);margin-bottom:.2rem">
+                  Eco-Conscious</h4>
+                <p style="font-size:.75rem;color:var(--muted);line-height:1.5;font-weight:300">100% eco-certified,
+                  UV-resistant paints on every project.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="about-visual reveal" style="transition-delay:.15s">
+          <div class="about-card glass-card" style="padding:2rem;text-align:center">
+            <div
+              style="font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1">
+              10</div>
+            <div
+              style="font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem;font-weight:500">
+              Years of Excellence</div>
+            <div
+              style="height:1px;background:linear-gradient(to right,transparent,rgba(184,147,58,0.3),transparent);margin:1.2rem 0">
+            </div>
+            <div
+              style="font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1">
+              120+</div>
+            <div
+              style="font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem;font-weight:500">
+              Curated Artists</div>
+            <div
+              style="height:1px;background:linear-gradient(to right,transparent,rgba(184,147,58,0.3),transparent);margin:1.2rem 0">
+            </div>
+            <div
+              style="font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1">
+              15</div>
+            <div
+              style="font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem;font-weight:500">
+              Industry Awards</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq-section" class="faq-section">
+      <!-- Ambient background blobs -->
+      <div class="faq-blob faq-blob--1" aria-hidden="true"></div>
+      <div class="faq-blob faq-blob--2" aria-hidden="true"></div>
+      <div class="faq-blob faq-blob--3" aria-hidden="true"></div>
+
+      <!-- Botanical line-art SVG decorations -->
+      <svg class="faq-botanical faq-botanical--tl" aria-hidden="true" viewBox="0 0 200 200" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <path d="M30 170C30 170 50 120 90 100C130 80 170 90 170 90" stroke="currentColor" stroke-width="0.8"
+          opacity="0.08" />
+        <path d="M40 180C40 180 70 110 120 95C150 85 180 100 180 100" stroke="currentColor" stroke-width="0.5"
+          opacity="0.06" />
+        <circle cx="90" cy="100" r="3" fill="currentColor" opacity="0.06" />
+        <circle cx="120" cy="95" r="2" fill="currentColor" opacity="0.05" />
+        <path d="M80 105C80 105 85 80 95 70C105 60 115 65 115 65" stroke="currentColor" stroke-width="0.5"
+          opacity="0.05" />
+      </svg>
+      <svg class="faq-botanical faq-botanical--br" aria-hidden="true" viewBox="0 0 200 200" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <path d="M170 30C170 30 150 80 110 100C70 120 30 110 30 110" stroke="currentColor" stroke-width="0.8"
+          opacity="0.08" />
+        <path d="M160 20C160 20 130 90 80 105C50 115 20 100 20 100" stroke="currentColor" stroke-width="0.5"
+          opacity="0.06" />
+        <ellipse cx="110" cy="100" rx="4" ry="6" fill="currentColor" opacity="0.04" />
+      </svg>
+
+      <!-- Section Header -->
+      <div class="faq-header reveal">
+        <span class="faq-label">FAQ</span>
+        <h2 class="faq-title">Frequently Asked Questions</h2>
+        <p class="faq-subtitle">Everything you need to know about our mural process, pricing, timelines, materials, and
+          artistic approach.</p>
+        <div class="faq-divider" aria-hidden="true"></div>
+      </div>
+
+      <!-- Two Column Layout -->
+      <div class="faq-layout">
+
+        <!-- LEFT: Info Card (35%) -->
+        <div class="faq-info-card reveal">
+          <div class="faq-info-card__inner">
+            <div class="faq-info-art" style="perspective: 800px; display: flex; align-items: center; justify-content: center; width: 120px; height: 120px; position: relative;">
+
+              <!-- 3D Style Glowing SVG Bulb (No Background) -->
+              <svg width="80" height="100" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" style="animation: floatBulb 4s infinite ease-in-out; filter: drop-shadow(0 10px 15px rgba(230,170,40,0.4));">
+                <defs>
+                  <radialGradient id="bulbGlow" cx="50%" cy="40%" r="50%">
+                    <stop offset="0%" stop-color="#fff5cc" />
+                    <stop offset="40%" stop-color="#ffdc5e" />
+                    <stop offset="85%" stop-color="#f5a623" />
+                    <stop offset="100%" stop-color="#cf7a00" />
+                  </radialGradient>
+                  <linearGradient id="baseMetal" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#8a8a8a" />
+                    <stop offset="30%" stop-color="#d1d1d1" />
+                    <stop offset="50%" stop-color="#e8e8e8" />
+                    <stop offset="70%" stop-color="#b3b3b3" />
+                    <stop offset="100%" stop-color="#696969" />
+                  </linearGradient>
+                  <linearGradient id="filament" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff" />
+                    <stop offset="100%" stop-color="#ffcc00" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Bulb Glass Body -->
+                <path d="M 50 5 C 20 5 10 25 10 45 C 10 65 30 75 35 90 L 65 90 C 70 75 90 65 90 45 C 90 25 80 5 50 5 Z" fill="url(#bulbGlow)" opacity="0.9" />
+
+                <!-- Highlights to make it look 3D and glossy -->
+                <path d="M 40 10 C 25 15 15 30 15 45 C 15 55 20 60 25 65 C 20 50 30 20 50 15 C 45 12 42 11 40 10 Z" fill="#ffffff" opacity="0.6" filter="blur(2px)" />
+                <path d="M 80 40 C 85 30 80 15 70 10 C 80 20 75 40 65 55 C 75 50 82 45 80 40 Z" fill="#ffffff" opacity="0.4" filter="blur(3px)" />
+
+                <!-- Inner Filament Support -->
+                <path d="M 45 90 L 45 65 M 55 90 L 55 65" stroke="#cc8800" stroke-width="2" />
+                <path d="M 45 65 Q 50 50 55 65" stroke="url(#filament)" stroke-width="3" fill="none" style="filter: drop-shadow(0 0 5px #ffaa00);" />
+                <circle cx="50" cy="58" r="4" fill="#ffffff" style="filter: drop-shadow(0 0 8px #ffffff);" />
+
+                <!-- Metal Base (Screw threads) -->
+                <rect x="35" y="90" width="30" height="5" rx="2" fill="url(#baseMetal)" />
+                <rect x="37" y="96" width="26" height="4" rx="2" fill="url(#baseMetal)" />
+                <rect x="37" y="101" width="26" height="4" rx="2" fill="url(#baseMetal)" />
+                <rect x="39" y="106" width="22" height="4" rx="2" fill="url(#baseMetal)" />
+                <path d="M 42 110 L 58 110 L 55 116 L 45 116 Z" fill="#333333" />
+
+                <!-- Bottom contact point -->
+                <circle cx="50" cy="116" r="3" fill="#111" />
+              </svg>
+
+              <style>
+                @keyframes floatBulb {
+                  0%, 100% { transform: translateY(0); filter: drop-shadow(0 10px 15px rgba(230,170,40,0.3)); }
+                  50% { transform: translateY(-8px); filter: drop-shadow(0 20px 25px rgba(230,170,40,0.7)); }
+                }
+              </style>
+            </div>
+            <!-- Decorative vase -->
+            <div class="faq-info-vase" aria-hidden="true">
+              <svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 15 Q20 15 18 20 Q14 30 16 45 Q18 60 22 65 L38 65 Q42 60 44 45 Q46 30 42 20 Q40 15 38 15 Z"
+                  fill="rgba(184,147,58,0.08)" stroke="rgba(184,147,58,0.18)" stroke-width="0.6" />
+                <ellipse cx="30" cy="15" rx="9" ry="3" fill="rgba(184,147,58,0.06)" stroke="rgba(184,147,58,0.15)"
+                  stroke-width="0.5" />
+                <path d="M26 10 Q28 2 30 0 Q32 2 34 10" stroke="rgba(107,124,107,0.2)" stroke-width="0.6" fill="none" />
+                <path d="M24 12 Q27 5 30 3" stroke="rgba(107,124,107,0.15)" stroke-width="0.4" fill="none" />
+                <line x1="20" y1="65" x2="40" y2="65" stroke="rgba(184,147,58,0.12)" stroke-width="0.5" />
+              </svg>
+            </div>
+            <h3 class="faq-info-heading">Have Questions?<br><span>We Have Answers.</span></h3>
+            <p class="faq-info-desc">Our team is always ready to guide you through the creative process — from first
+              concept to final brushstroke.</p>
+            <a href="#contact-section" class="faq-info-cta">
+              Contact Us <span class="faq-cta-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- RIGHT: FAQ Accordion (65%) -->
+        <div class="faq-accordion" id="faq-accordion">
+
+          <div class="faq-item reveal" style="transition-delay:.05s">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-text">How does the mural creation process work?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer__inner">
+                <p>Our process begins with a detailed consultation where we understand your space, vision, and brand
+                  story. We then provide curated artist recommendations, mood boards, and digital mockups for your
+                  approval. Once the design is finalised, our team handles everything — from surface preparation and
+                  scaffolding to the final UV-resistant clear coat.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item reveal" style="transition-delay:.1s">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-text">What is the typical timeline for a mural project?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer__inner">
+                <p>Timelines vary depending on the scale and complexity of the artwork. A small indoor accent wall
+                  typically takes 3–5 days, while a large exterior mural can take 2–4 weeks. The design and approval
+                  phase usually takes an additional 1–2 weeks. We always provide a detailed project timeline upfront so
+                  there are no surprises.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item reveal" style="transition-delay:.15s">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-text">What types of paints and materials do you use?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer__inner">
+                <p>We exclusively use premium, eco-certified paints that are UV-resistant, weatherproof, and non-toxic.
+                  For outdoor murals, we apply specialised anti-graffiti and UV-protective clear coats that ensure the
+                  artwork retains its vibrancy for 10+ years. All our materials are sourced from trusted brands and
+                  tested for architectural-grade durability.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item reveal" style="transition-delay:.2s">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-text">How is pricing determined for mural projects?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer__inner">
+                <p>Pricing depends on factors such as wall size, complexity of the design, surface condition, location,
+                  and the artist's specialisation. We provide transparent, itemised quotes after an initial site
+                  assessment. Our projects typically range from ₹150 to ₹800 per sq. ft. — and we always work within
+                  your budget to find the best creative solution.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item reveal" style="transition-delay:.25s">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-text">Can I choose or request a specific artist?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer__inner">
+                <p>Absolutely. We maintain a curated network of 120+ professional artists, each with distinct
+                  specialisations — from botanical and abstract to geometric and photorealistic. During the consultation
+                  phase, we present artist portfolios that best match your project's aesthetic, and you have full
+                  creative control over the final artist selection.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item reveal" style="transition-delay:.3s">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-text">Do you work on both commercial and residential projects?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer__inner">
+                <p>Yes. We work across all scales — from intimate bedroom accent walls to large-scale corporate office
+                  transformations, hotel lobbies, restaurants, schools, and public art installations. Every project,
+                  regardless of size, receives the same attention to detail, premium materials, and professional project
+                  management.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item reveal" style="transition-delay:.35s">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-text">What happens if I'm not satisfied with the design?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer__inner">
+                <p>Your satisfaction is our highest priority. We include up to three rounds of revisions during the
+                  digital mockup stage — before any paint touches the wall. Our collaborative design process ensures
+                  you're fully aligned with the concept, colour palette, and composition before execution begins. We
+                  don't proceed until you're thrilled with the design.</p>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="faq-item reveal" style="transition-delay:.4s">
+            <button class="faq-question" aria-expanded="false">
+              <span class="faq-q-text">Do you provide maintenance after the mural is completed?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer__inner">
+                <p>Yes. We share simple care instructions after handover and can schedule periodic touch-ups or
+                  protective coat refreshes for high-traffic and outdoor murals. Our team will recommend the right
+                  maintenance plan based on the wall surface, location, and exposure.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom CTA -->
+      <div class="faq-bottom-cta reveal">
+        <div class="faq-bottom-cta__card">
+          <h3 class="faq-bottom-cta__title">Still have questions?</h3>
+          <p class="faq-bottom-cta__desc">Our team is here to help you create your dream mural. Let's start a
+            conversation.</p>
+          <a href="#contact-section" class="faq-bottom-cta__btn">
+            Book a Consultation <span class="faq-cta-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <img src="./assets/images/logo.png" alt="ashmija in color logo" class="footer-logo-img">
+          <span class="logo-text">Ashmija <span>in color</span></span>
+        </div>
+        <p class="footer-desc">Transforming spaces through the power of curated mural art across India since 2015.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Navigate</h5>
+        <ul>
+          <li><a href="#portfolio-section" id="footer-link-gallery">Gallery</a></li>
+          <li><a href="#artists-section" id="footer-link-artists">Our Artists</a></li>
+          <li><a href="#why-us-section" id="footer-link-projects">Projects</a></li>
+          <li><a href="#contact-section" id="footer-link-contact">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <ul>
+          <li><a href="#about-section" id="footer-link-story">About Us</a></li>
+          <li><a href="#hero-section" id="footer-link-home">Home</a></li>
+          <li><a href="#stats-band" id="footer-link-stats">Our Impact</a></li>
+          <li><a href="#cta-section" id="footer-link-cta">Get Started</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="#" id="footer-link-office">Kallakurichi Office</a></li>
+          <li><a href="mailto:ashmijaincolor@gmail.com" id="footer-link-email">ashmijaincolor@gmail.com</a></li>
+          <li><a href="tel:+918870120750" id="footer-link-phone">+91 8870120750</a></li>
+          <li><a href="#" id="footer-link-whatsapp">WhatsApp Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 ashmija in color. All rights reserved.</div>
+      <div class="footer-watermark">
+        <img src="./assets/images/kyrav_logo.png" alt="KYRAV logo" class="watermark-logo">
+        <span>developed by <strong>KYRAV WEB STUDIO</strong> | Where Confidence Meets Creativity.</span>
+      </div>
+      <div class="footer-socials">
+        <a href="https://www.instagram.com/ashmija_in_color?igsh=NzhrbGJvaWVhMTJ3" class="social-icon instagram"
+          id="footer-social-instagram" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+          <i class="ti ti-brand-instagram"></i>
+        </a>
+        <a href="https://www.facebook.com/share/1JFvUQGTUA/" class="social-icon facebook" id="footer-social-facebook"
+          aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+          <i class="ti ti-brand-facebook"></i>
+        </a>
+        <a href="https://www.linkedin.com/company/ashmija-in-color/" class="social-icon linkedin"
+          id="footer-social-linkedin" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+          <i class="ti ti-brand-linkedin"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal Backdrop -->
+  <div id="modal-backdrop" class="modal-backdrop"></div>
+
+
+
+  <div id="whatsapp-cta" class="whatsapp-cta" style="display:none;">
+    <a id="whatsapp-cta-link" href="#" target="_blank" rel="noreferrer noopener" aria-label="Chat with us">
+      <span class="ti ti-brand-whatsapp"></span>
+      <span class="whatsapp-tooltip">Chat with us</span>
+    </a>
+  </div>
+
+  <!-- Team Overview Modal -->
+  <div id="team-modal" class="creator-modal-container overview" role="dialog" aria-modal="true">
+    <button type="button" class="modal-close-btn" id="team-modal-close" aria-label="Close modal">&times;</button>
+    <div class="modal-body-content single-col">
+      <span class="creator-role-badge">ashmija in color Collective</span>
+      <h3 class="creator-name-title">Our Curation & Network</h3>
+      <p class="creator-bio-text">
+        At ashmija in color, we maintain a highly curated network of over 120 professional muralists, traditional
+        painters, graffiti artists, and sculptors across South Asia.
+      </p>
+      <p class="creator-bio-text">
+        Our artists are selected not only for their exceptional visual craftsmanship but also for their understanding of
+        architectural scale, safety standards, and durable material applications. We handle the entire lifecycle: design
+        licensing, digital mockup staging, scaffold logistics, and weather-proof varnishing.
+      </p>
+      <div class="creator-stats-wrap" style="margin-top:1.5rem;justify-content:flex-start">
+        <span class="creator-stat-badge">✦ 120+ Active Artists</span>
+        <span class="creator-stat-badge">✦ 38+ Cities Connected</span>
+        <span class="creator-stat-badge">✦ Staging & Safety Audited</span>
+      </div>
+      <div style="margin-top:2rem;display:flex;gap:1rem">
+        <button class="btn"
+          style="padding:.75rem 1.8rem;border:none;border-radius:6px;background:var(--gold);color:white;cursor:pointer;font-weight:500;font-size:.85rem;transition:background .3s"
+          onclick="document.getElementById('contact-section').scrollIntoView({behavior:'smooth'}); document.getElementById('team-modal').classList.remove('active'); document.getElementById('modal-backdrop').classList.remove('active');">Book
+          an Artist</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Reviews Modal -->
+  <div id="all-reviews-modal" class="creator-modal-container all-reviews-modal" role="dialog" aria-modal="true">
+    <button type="button" class="modal-close-btn" aria-label="Close modal">&times;</button>
+    <div class="modal-body-content single-col" style="max-height:85vh;overflow-y:auto;padding:2.8rem 2.4rem 2.2rem;">
+      <span class="creator-role-badge">Client Testimonials</span>
+      <h3 class="creator-name-title" style="margin-bottom:1.5rem;">All Client Reviews</h3>
+      <div id="all-reviews-list" class="all-reviews-list">
+        <!-- Reviews will be loaded dynamically here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating & Review Modal -->
+  <div id="rating-modal" class="creator-modal-container review-modal" role="dialog" aria-modal="true">
+    <button type="button" class="modal-close-btn" aria-label="Close modal">&times;</button>
+    <div class="modal-body-content single-col">
+      <span class="creator-role-badge">Share Your Review</span>
+      <h3 class="creator-name-title">Rate ashmija in color</h3>
+
+      <div class="review-avatar-options">
+        <label class="rating-avatar selected">
+          <input type="radio" name="review-avatar"
+            value="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&h=150"
+            checked>
+          <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&h=150"
+            alt="Reviewer option one">
+        </label>
+        <label class="rating-avatar">
+          <input type="radio" name="review-avatar"
+            value="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150">
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150"
+            alt="Reviewer option two">
+        </label>
+        <label class="rating-avatar">
+          <input type="radio" name="review-avatar"
+            value="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150"
+            alt="Reviewer option three">
+        </label>
+      </div>
+
+      <form id="review-form" class="review-form">
+        <div class="form-row">
+          <label>Your Photo (optional - overrides avatar selection)
+            <input type="file" id="review-avatar-file" accept="image/*" style="margin-top: 0.25rem; width: 100%;">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Full Name
+            <input type="text" name="reviewerName" placeholder="Your name" required>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Company / Role
+            <input type="text" name="reviewerCompany" placeholder="Your title or company" required>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Rating
+            <select name="reviewRating" required>
+              <option value="5">5 - Excellent</option>
+              <option value="4">4 - Very Good</option>
+              <option value="3">3 - Good</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Your Review
+            <textarea name="reviewText" rows="4" placeholder="Share your experience..." required></textarea>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Project Work Photo
+            <input type="file" id="review-work-image" accept="image/*" style="margin-top: 0.25rem; width: 100%;">
+          </label>
+        </div>
+        <button type="submit" class="btn-primary" id="submit-review-btn">Submit Review</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ML Reply Confirmation Modal -->
+  <div id="ml-reply-modal" class="creator-modal-container review-modal" role="dialog" aria-modal="true">
+    <button type="button" class="modal-close-btn" id="ml-reply-modal-close" aria-label="Close modal">&times;</button>
+    <div class="modal-body-content single-col" style="padding: 2.8rem 2.4rem 2.2rem;">
+      <div id="ml-reply-modal-emoji"
+        style="font-size: 3.5rem; text-align: center; margin-bottom: 0.8rem; line-height: 1; animation: emojiPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;">
+      </div>
+      <div id="ml-reply-modal-text" class="reply-card-body"
+        style="background: #fffdf6; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; padding: 1.4rem 1.6rem; text-align: left; font-size: 0.98rem; line-height: 1.7; color: var(--ink2); white-space: pre-line; box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
+        <!-- ML reply text will be inserted here -->
+      </div>
+      <button type="button" class="btn-secondary" id="ml-reply-modal-ok-btn"
+        style="margin-top: 1.8rem; padding: 0.7rem 2.2rem;">Got it</button>
+    </div>
+  </div>
+
+  <!-- Testimonial Image Modal -->
+  <div id="testimonial-image-modal" class="creator-modal-container" role="dialog" aria-modal="true">
+    <button type="button" class="modal-close-btn" id="testimonial-modal-close" aria-label="Close modal">&times;</button>
+    <div class="modal-body-content single-col"
+      style="padding: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1.2rem;">
+      <div class="modal-image-preview-wrap"
+        style="width: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.15); max-height: 70vh;">
+        <img id="testimonial-modal-img" src="" alt="Project Image"
+          style="width: 100%; height: 100%; object-fit: contain; display: block;">
+      </div>
+      <div class="testimonial-modal-info" style="text-align: center; width: 100%;">
+        <span class="creator-role-badge" id="testimonial-modal-place"
+          style="font-size: 0.9rem; padding: 0.4rem 1.2rem; background: var(--gold); color: white; border-radius: 20px;">Place</span>
+        <h3 id="testimonial-modal-client"
+          style="font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--ink); margin-top: 0.8rem; margin-bottom: 0.4rem;">
+          Client</h3>
+      </div>
+    </div>
+  </div>
+
+
+
+</body>
+
+</html>

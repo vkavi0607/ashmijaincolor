@@ -1,0 +1,218 @@
+'use strict';
+
+(function () {
+  const SECTION_ID = 'section-config';
+  const TABLE_NAME = 'site_config';
+  const WARNING_BANNER_ID = 'config-warning-banner';
+  const SAVE_BUTTON_ID = 'btn-save-config';
+  const PREVIEW_BUTTON_ID = 'btn-preview-live';
+
+  const FIELD_MAP = {
+    hero_tagline       : 'config-hero-tagline',
+    hero_sub           : 'config-hero-sub',
+    stat_sqft          : 'config-stat-sqft',
+    stat_projects      : 'config-stat-projects',
+    stat_cities        : 'config-stat-cities',
+    contact_phone      : 'config-contact-phone',
+    contact_email      : 'config-contact-email',
+    contact_whatsapp   : 'config-contact-whatsapp',
+  };
+
+  let _hasUnsavedChanges = false;
+  let _schemaWarningShown = false;
+
+  function getDb() {
+    return window.db || null;
+  }
+
+  function showToastSafe(type, message) {
+    if (typeof window.showToast === 'function') {
+      window.showToast(message, type);
+      return;
+    }
+    console[type === 'error' ? 'error' : 'log']('[config] ' + message);
+  }
+
+  async function logAudit(module, action, details = {}) {
+    if (typeof window.logAudit === 'function') {
+      return window.logAudit(module, action, details);
+    }
+
+    try {
+      const db = getDb();
+      if (!db) return;
+      const { data: { session } = {} } = await db.auth.getSession();
+      const userId = session?.user?.id ?? null;
+      await db.from('audit_log').insert({
+        module,
+        action,
+        details,
+        user_id: userId,
+        created_at: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.warn('[config] audit failed', err);
+    }
+  }
+
+  function getElement(id) {
+    return document.getElementById(id);
+  }
+
+  function setUnsavedChanges(value) {
+    _hasUnsavedChanges = Boolean(value);
+    const banner = getElement(WARNING_BANNER_ID);
+    if (banner) {
+      banner.style.display = _hasUnsavedChanges ? 'block' : 'none';
+    }
+  }
+
+  function getConfigInputs() {
+    return Object.entries(FIELD_MAP).reduce((result, [key, id]) => {
+      const input = getElement(id);
+      if (input) {
+        result[key] = input.value.trim();
+      }
+      return result;
+    }, {});
+  }
+
+  function isMissingTableError(err) {
+    const message = String(err?.message || err?.details || err || '').toLowerCase();
+    return message.includes('could not find the table') ||
+      message.includes('schema cache') ||
+      message.includes('does not exist');
+  }
+
+  function shouldBypassRemoteData() {
+    return typeof window.shouldBypassRemoteData === 'function' && window.shouldBypassRemoteData();
+  }
+
+  async function loadConfig() {
+    const section = getElement(SECTION_ID);
+    if (!section) return;
+
+    try {
+      if (shouldBypassRemoteData()) {
+        Object.values(FIELD_MAP).forEach((id) => {
+          const input = getElement(id);
+          if (input) input.value = '';
+        });
+        setUnsavedChanges(false);
+        return;
+      }
+
+      const db = getDb();
+      if (!db) {
+        console.warn('[config] Database client not available');
+        return;
+      }
+
+      const { data, error } = await db.from(TABLE_NAME).select('key,value');
+      if (error) throw error;
+
+      const config = (data || []).reduce((acc, row) => {
+        acc[row.key] = row.value;
+        return acc;
+      }, {});
+
+      Object.entries(FIELD_MAP).forEach(([key, id]) => {
+        const input = getElement(id);
+        if (input) input.value = config[key] || '';
+      });
+
+      setUnsavedChanges(false);
+    } catch (err) {
+      if (isMissingTableError(err)) {
+        if (!_schemaWarningShown) {
+          showToastSafe('warning', 'Site config table is missing in database. Using blank defaults until the schema is applied.');
+          _schemaWarningShown = true;
+        }
+        Object.values(FIELD_MAP).forEach((id) => {
+          const input = getElement(id);
+          if (input) input.value = '';
+        });
+        setUnsavedChanges(false);
+        return;
+      }
+
+      console.error('[config] load error', err);
+      showToastSafe('error', 'Unable to load site configuration.');
+    }
+  }
+
+  async function saveConfig() {
+    try {
+      const db = getDb();
+      if (!db) throw new Error('Database client not available');
+
+      const payload = Object.entries(FIELD_MAP).map(([key, id]) => {
+        const input = getElement(id);
+        return { key, value: input ? input.value.trim() : '' };
+      });
+
+      const { error } = await db.from(TABLE_NAME).upsert(payload, { onConflict: ['key'] });
+      if (error) throw error;
+
+      await logAudit('site_config', 'update', { keys: payload.map(item => item.key) });
+      window.notifyContentChange?.('config', { action: 'update' });
+      showToastSafe('success', 'Site configuration saved successfully.');
+      setUnsavedChanges(false);
+    } catch (err) {
+      console.error('[config] save error', err);
+      showToastSafe('error', err.message || 'Could not save site configuration.');
+    }
+  }
+
+  function attachInputListeners() {
+    Object.values(FIELD_MAP).forEach((id) => {
+      const input = getElement(id);
+      if (!input) return;
+      input.addEventListener('input', () => setUnsavedChanges(true));
+    });
+  }
+
+  function initPreviewButton() {
+    const previewButton = getElement(PREVIEW_BUTTON_ID);
+    if (!previewButton) return;
+    previewButton.addEventListener('click', () => {
+      const isFileProtocol = window.location.protocol === 'file:';
+      if (isFileProtocol) {
+        showToastSafe(
+          'warning',
+          'Open the site through a local web server to preview it from the admin console. File-based previews are blocked by the browser.'
+        );
+        return;
+      }
+
+      const previewUrl = new URL('../../index.html', window.location.href);
+      window.open(previewUrl.href, '_blank', 'noopener,noreferrer');
+    });
+  }
+
+  function initSaveButton() {
+    const saveButton = getElement(SAVE_BUTTON_ID);
+    if (!saveButton) return;
+    saveButton.addEventListener('click', saveConfig);
+  }
+
+  let _isInitialized = false;
+
+  async function initAdminConfig() {
+    const section = getElement(SECTION_ID);
+    if (!section) return;
+    if (_isInitialized) {
+      await loadConfig();
+      return;
+    }
+    _isInitialized = true;
+
+    attachInputListeners();
+    initSaveButton();
+    initPreviewButton();
+    await loadConfig();
+  }
+
+  window.initConfig = initAdminConfig;
+
+})();
