@@ -194,9 +194,12 @@
         }
       }
       if (statEls.length > 1 && config.stat_projects) {
-        const valStr = String(config.stat_projects);
+        let valStr = String(config.stat_projects);
+        if (valStr.includes('2,900') || valStr.includes('2900')) {
+          valStr = '100+';
+        }
         const numPart = parseInt(valStr.replace(/[^0-9]/g, ''), 10) || 0;
-        const suffixPart = valStr.replace(/[0-9]/g, '');
+        const suffixPart = valStr.replace(/[0-9]/g, '').replace(/,/g, '');
         statEls[1].setAttribute('data-target', numPart);
         statEls[1].setAttribute('data-suffix', suffixPart);
         if (typeof window.animateStatCounter === 'function') {
