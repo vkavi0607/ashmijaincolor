@@ -55,68 +55,7 @@
   }
 
   function getFallbackPortfolio() {
-    return [
-      {
-        id: 'fallback-botanical-bloom',
-        title: 'Botanical Bloom',
-        artist_name: 'Priya Natarajan',
-        client: 'Google India - Chennai Campus',
-        location: 'Chennai, Tamil Nadu',
-        area: '2,400 sq. ft.',
-        art_type: 'Botanical Mural · Hand-Painted',
-        category: 'corporate',
-        year: 2024,
-        image_url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=600&h=900&q=80',
-        display_order: 0,
-        is_featured: true,
-        is_hidden: false,
-      },
-      {
-        id: 'fallback-urban-grid',
-        title: 'Urban Grid',
-        artist_name: 'Arun K.',
-        client: 'WeWork - Bangalore Hub',
-        location: 'Bangalore, Karnataka',
-        area: '850 sq. ft.',
-        art_type: 'Geometric Street Art',
-        category: 'corporate',
-        year: 2024,
-        image_url: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?auto=format&fit=crop&w=600&h=400&q=80',
-        display_order: 1,
-        is_featured: false,
-        is_hidden: false,
-      },
-      {
-        id: 'fallback-golden-axis',
-        title: 'Golden Axis',
-        artist_name: 'Ravi S.',
-        client: 'ITC Grand Chola',
-        location: 'Guindy, Chennai',
-        area: '680 sq. ft.',
-        art_type: 'Gold Leaf Abstract',
-        category: 'hotels',
-        year: 2024,
-        image_url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=600&h=400&q=80',
-        display_order: 2,
-        is_featured: false,
-        is_hidden: false,
-      },
-      {
-        id: 'fallback-nebula',
-        title: 'Nebula',
-        artist_name: 'Divya M.',
-        client: 'Zoho Corporation',
-        location: 'Tenkasi, Tamil Nadu',
-        area: '1,500 sq. ft.',
-        art_type: 'Cosmic Mural · Spray Art',
-        category: 'corporate',
-        year: 2024,
-        image_url: 'https://images.unsplash.com/photo-1533158326339-7f3cf2404354?auto=format&fit=crop&w=600&h=400&q=80',
-        display_order: 3,
-        is_featured: false,
-        is_hidden: false,
-      },
-    ];
+    return [];
   }
 
   window.getFallbackPortfolioItems = getFallbackPortfolio;

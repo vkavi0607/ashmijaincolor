@@ -182,27 +182,39 @@
 
       const statEls = document.querySelectorAll('.hero-stat-num');
       if (statEls.length > 0 && config.stat_sqft) {
-        statEls[0].setAttribute('data-target', config.stat_sqft);
+        const valStr = String(config.stat_sqft);
+        const numPart = parseInt(valStr.replace(/[^0-9]/g, ''), 10) || 0;
+        const suffixPart = valStr.replace(/[0-9]/g, '');
+        statEls[0].setAttribute('data-target', numPart);
+        statEls[0].setAttribute('data-suffix', suffixPart);
         if (typeof window.animateStatCounter === 'function') {
           window.animateStatCounter(statEls[0]);
         } else {
-          statEls[0].textContent = config.stat_sqft + (statEls[0].getAttribute('data-suffix') || '');
+          statEls[0].textContent = numPart + suffixPart;
         }
       }
       if (statEls.length > 1 && config.stat_projects) {
-        statEls[1].setAttribute('data-target', config.stat_projects);
+        const valStr = String(config.stat_projects);
+        const numPart = parseInt(valStr.replace(/[^0-9]/g, ''), 10) || 0;
+        const suffixPart = valStr.replace(/[0-9]/g, '');
+        statEls[1].setAttribute('data-target', numPart);
+        statEls[1].setAttribute('data-suffix', suffixPart);
         if (typeof window.animateStatCounter === 'function') {
           window.animateStatCounter(statEls[1]);
         } else {
-          statEls[1].textContent = config.stat_projects + (statEls[1].getAttribute('data-suffix') || '');
+          statEls[1].textContent = numPart + suffixPart;
         }
       }
       if (statEls.length > 2 && config.stat_cities) {
-        statEls[2].setAttribute('data-target', config.stat_cities);
+        const valStr = String(config.stat_cities);
+        const numPart = parseInt(valStr.replace(/[^0-9]/g, ''), 10) || 0;
+        const suffixPart = valStr.replace(/[0-9]/g, '');
+        statEls[2].setAttribute('data-target', numPart);
+        statEls[2].setAttribute('data-suffix', suffixPart);
         if (typeof window.animateStatCounter === 'function') {
           window.animateStatCounter(statEls[2]);
         } else {
-          statEls[2].textContent = config.stat_cities + (statEls[2].getAttribute('data-suffix') || '');
+          statEls[2].textContent = numPart + suffixPart;
         }
       }
 
