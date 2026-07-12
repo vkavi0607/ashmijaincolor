@@ -1,47 +1,14 @@
 'use strict';
 
 (function () {
-  const ADMIN_SECTION_ID = 'section-faq';
   const TABLE_NAME = 'faqs';
-
-  let _faqs = [];
-  let _sortable = null;
-  let _quill = null;
-  let _editingId = null;
-  let _schemaWarningShown = false;
 
   function getDb() {
     return window.db || null;
   }
 
-  function showToastSafe(type, message) {
-    if (typeof window.showToast === 'function') {
-      window.showToast(message, type);
-      return;
-    }
-    console[type === 'error' ? 'error' : 'log']('[faq] ' + message);
-  }
-
-  async function logAudit(module, action, details = {}) {
-    if (typeof window.logAudit === 'function') {
-      return window.logAudit(module, action, details);
-    }
-
-    try {
-      const db = getDb();
-      if (!db) return;
-      const { data: { session } = {} } = await db.auth.getSession();
-      const userId = session?.user?.id ?? null;
-      await db.from('audit_log').insert({
-        module,
-        action,
-        details,
-        user_id: userId,
-        created_at: new Date().toISOString(),
-      });
-    } catch (err) {
-      console.warn('[faq] audit failed', err);
-    }
+  function shouldBypassRemoteData() {
+    return typeof window.shouldBypassRemoteData === 'function' && window.shouldBypassRemoteData();
   }
 
   function escapeHtml(value) {
@@ -49,30 +16,6 @@
     div.textContent = value;
     return div.innerHTML;
   }
-
-  function getCategoryLabel(item) {
-    if (item.category) return escapeHtml(item.category);
-    return 'General';
-  }
-
-  function getVisibleLabel(item) {
-    if (typeof item.is_visible === 'boolean') {
-      return item.is_visible ? 'Yes' : 'No';
-    }
-    return 'Yes';
-  }
-
-  function isMissingTableError(err) {
-    const message = String(err?.message || err?.details || err || '').toLowerCase();
-    return message.includes('could not find the table') ||
-      message.includes('schema cache') ||
-      message.includes('does not exist');
-  }
-
-  function shouldBypassRemoteData() {
-    return typeof window.shouldBypassRemoteData === 'function' && window.shouldBypassRemoteData();
-  }
-
 
   const FALLBACK_PUBLIC_FAQS = [
     {
@@ -129,67 +72,12 @@
 
     return list;
   }
-  async function fetchFaqs() {
-    const db = getDb();
-    if (!db) throw new Error('Database client not available');
-    if (shouldBypassRemoteData()) return [];
 
-    const { data, error } = await db.from(TABLE_NAME)
-      .select('*')
-      .order('display_order', { ascending: true });
-
-    if (error) throw error;
-    return data || [];
-  }
-
-      onConfirm: async function () {
-        const questionInput = document.getElementById('faq-question-input');
-        const question = questionInput ? questionInput.value.trim() : '';
-        const answer = getEditorContent();
-
-        if (!question) {
-          showToastSafe('error', 'Please add a question.');
-          return;
-        }
-        if (!answer || answer === '<p><br></p>') {
-          showToastSafe('error', 'Please add an answer.');
-          return;
-        }
-
-        try {
-          const db = getDb();
-          if (!db) throw new Error('Database client not available');
-
-          if (_editingId) {
-            const { error } = await db.from(TABLE_NAME)
-              .update({ question, answer })
-              .eq('id', _editingId);
-            if (error) throw error;
-            await logAudit('faq', 'update', { id: _editingId, question });
-            showToastSafe('success', 'FAQ updated successfully.');
-          } else {
-            const maxOrder = _faqs.length ? Math.max(..._faqs.map(item => item.display_order || 0)) : -1;
-            const payload = {
-              question,
-              answer,
-              display_order: maxOrder + 1,
-            };
-            const { error } = await db.from(TABLE_NAME).insert(payload);
-            if (error) throw error;
-            await logAudit('faq', 'create', { question });
-            showToastSafe('success', 'FAQ added successfully.');
-          }
-
-          closeModal();
-          await loadFaqs();
-        } catch (err) {
-          console.error('[faq] save error', err);
-          showToastSafe('error', err.message || 'Could not save FAQ item.');
-        }
-      },
-    });
-
-    initQuill(faq.answer || '');
+  function isMissingTableError(err) {
+    const message = String(err?.message || err?.details || err || '').toLowerCase();
+    return message.includes('could not find the table') ||
+      message.includes('schema cache') ||
+      message.includes('does not exist');
   }
 
   function createFaqSection() {
@@ -336,7 +224,6 @@
     });
   }
 
-
   function restoreStaticFaqSection(section, originalHtml) {
     if (section && originalHtml !== null) {
       section.innerHTML = originalHtml;
@@ -347,6 +234,7 @@
       attachFaqAccordionListeners(list);
     }
   }
+
   async function renderFAQsToMainSite(dbClient) {
     let section = document.getElementById('faq-section');
     const originalHtml = section ? section.innerHTML : null;
@@ -354,7 +242,6 @@
     if (section) {
       const list = section.querySelector('.faq-accordion') || section.querySelector('.faq-list');
       if (list) {
-        // Show a premium skeleton loader inside the FAQ list while fetching data
         list.innerHTML = Array(4).fill(0).map(() => `
           <div class="skeleton-faq-item">
             <div class="skeleton-faq-text skeleton-shimmer"></div>
@@ -431,10 +318,4 @@
   }
 
   window.renderFAQsToMainSite = renderFAQsToMainSite;
-
-  let _isInitialized = false;
-
-  document.addEventListener('DOMContentLoaded', function () {
-    initAdminFaqSection();
-  });
 })();
