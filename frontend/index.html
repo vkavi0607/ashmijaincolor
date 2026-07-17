@@ -1103,6 +1103,8 @@
               <option value="5">5 - Excellent</option>
               <option value="4">4 - Very Good</option>
               <option value="3">3 - Good</option>
+              <option value="2">2 - Not good</option>
+              <option value="1">1 - Poor</option>
             </select>
           </label>
         </div>
@@ -1114,6 +1116,12 @@
         <div class="form-row">
           <label>Project Work Photo
             <input type="file" id="review-work-image" accept="image/*" style="margin-top: 0.25rem; width: 100%;">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Your Photo <span style="font-size:0.75rem;color:var(--muted);font-weight:300;">(optional — adds your
+              face to the review)</span>
+            <input type="file" id="review-avatar-file" accept="image/*" style="margin-top: 0.25rem; width: 100%;">
           </label>
         </div>
         <button type="submit" class="btn-primary" id="submit-review-btn">Submit Review</button>

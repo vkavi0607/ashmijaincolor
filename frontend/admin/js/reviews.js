@@ -37,6 +37,45 @@
         details,
         user_id: userId,
         created_at: new Date().toISOString(),
+'use strict';
+
+(function () {
+  const ADMIN_SECTION_ID = 'section-reviews';
+  const TABLE_NAME = 'reviews';
+
+  let _reviews = [];
+  let _searchTimer = null;
+  let _editingId = null;
+  let _schemaWarningShown = false;
+
+  function getDb() {
+    return window.db || null;
+  }
+
+  function showToastSafe(type, message) {
+    if (typeof window.showToast === 'function') {
+      window.showToast(message, type);
+      return;
+    }
+    console[type === 'error' ? 'error' : 'log'](`[reviews] ${message}`);
+  }
+
+  async function logAudit(module, action, details = {}) {
+    if (typeof window.logAudit === 'function') {
+      return window.logAudit(module, action, details);
+    }
+
+    try {
+      const db = getDb();
+      if (!db) return;
+      const { data: { session } = {} } = await db.auth.getSession();
+      const userId = session?.user?.id ?? null;
+      await db.from('audit_log').insert({
+        module,
+        action,
+        details,
+        user_id: userId,
+        created_at: new Date().toISOString(),
       });
     } catch (err) {
       console.warn('[reviews] audit failed', err);
@@ -50,6 +89,21 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  function generateMonogram(name) {
+    const words = String(name || 'A').trim().split(/\s+/);
+    const initials = words.length >= 2
+      ? (words[0][0] + words[words.length - 1][0]).toUpperCase()
+      : (words[0][0] || 'A').toUpperCase();
+    const COLOURS = [
+      ['#b8933a', '#f7f3eb'], ['#8b4a2f', '#fff8f0'],
+      ['#6b7c6b', '#f4f8f4'], ['#3a3530', '#f5f0e8'], ['#9b6b21', '#fffaf0'],
+    ];
+    const idx = (initials.charCodeAt(0) + (initials.charCodeAt(1) || 0)) % COLOURS.length;
+    const [bg, fg] = COLOURS[idx];
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><circle cx="75" cy="75" r="75" fill="${bg}"/><text x="75" y="75" dy="0.35em" text-anchor="middle" font-family="Playfair Display, Georgia, serif" font-size="56" font-weight="600" fill="${fg}" letter-spacing="2">${initials}</text></svg>`;
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   }
 
   function formatDate(value) {
@@ -156,6 +210,9 @@
 
     return `
       <tr data-id="${review.id}">
+        <td style="text-align:center;">
+          <img src="${review.avatar_url || generateMonogram(review.name || 'A')}" alt="${escHtml(review.name)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(184,147,58,0.3);">
+        </td>
         <td style="text-align:center;">${rating}</td>
         <td>${name}</td>
         <td>${company}</td>
@@ -273,36 +330,16 @@
     const isApproved = _editingId ? review.is_approved : false;
     const isPinned = _editingId ? review.is_pinned : false;
 
-    const presetAvatars = [
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&h=150",
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150",
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150"
-    ];
-
-    const currentAvatar = review.avatar_url || presetAvatars[0];
-    const isPreset = presetAvatars.includes(currentAvatar);
-
     openModal({
       title: isEdit ? 'Edit Review' : 'Add Review',
       size: 'lg',
       bodyHTML: `
         <div class="form-grid">
           <div class="form-group full">
-            <label class="form-label" style="text-align: center; display: block; margin-bottom: 0.5rem;">Choose Avatar Option</label>
-            <div class="review-avatar-options">
-              ${presetAvatars.map((url, idx) => `
-                <label class="rating-avatar${currentAvatar === url ? ' selected' : ''}">
-                  <input type="radio" name="review-avatar" value="${url}" ${currentAvatar === url ? 'checked' : ''}>
-                  <img src="${url}" alt="Preset option ${idx + 1}">
-                </label>
-              `).join('')}
-            </div>
-          </div>
-          <div class="form-group full">
-            <label class="form-label" for="review-avatar-file">Your Photo (optional - overrides avatar selection)</label>
-            <input class="form-input" type="file" id="review-avatar-file" accept="image/*" style="width: 100%;" />
-            <div style="text-align: center; margin-top: 8px;">
-              <img id="avatar-image-preview" class="review-modal-upload-preview${!isPreset && currentAvatar && currentAvatar.startsWith('data:') ? ' active' : ''}" src="${!isPreset ? currentAvatar : ''}" style="border-radius: 50%; width: 72px; height: 72px; display: ${!isPreset && currentAvatar && currentAvatar.startsWith('data:') ? 'inline-block' : 'none'}; object-fit: cover;" />
+            <label class="form-label" for="review-avatar-file">Client Photo <span style="font-weight:300;font-size:0.82rem;color:var(--muted);">(optional — if not uploaded, initials will be shown)</span></label>
+            <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:0.5rem;">
+              <img id="avatar-image-preview" src="${review.avatar_url || generateMonogram(review.name || 'A')}" style="border-radius:50%;width:64px;height:64px;object-fit:cover;border:2px solid rgba(184,147,58,0.35);flex-shrink:0;" alt="Avatar preview">
+              <input class="form-input" type="file" id="review-avatar-file" accept="image/*" style="flex:1;" />
             </div>
           </div>
           <div class="form-group full">
@@ -336,71 +373,6 @@
                 <label>Vertical <input type="range" id="work-image-crop-y" min="0" max="100" value="50"></label>
               </div>
               <p style="margin: 8px 0 0; font-size: 0.78rem; color: var(--muted);">Drag the image to position the crop, or use the controls. The cropped image below will be saved.</p>
-            </div>
-            <div style="text-align: center; margin-top: 8px;">
-              <img id="work-image-preview" class="review-modal-upload-preview${parseReviewText(review.review_text).workImage ? ' active' : ''}" src="${parseReviewText(review.review_text).workImage || ''}" style="max-width: 100%; height: 120px; border-radius: 8px; object-fit: cover; display: ${parseReviewText(review.review_text).workImage ? 'inline-block' : 'none'};" />
-            </div>
-          </div>
-          <div class="form-group full">
-            <label class="form-label" for="review-reply-text">Owner Response / Reply</label>
-            <textarea class="form-input" id="review-reply-text" rows="3" placeholder="Write a response to this review...">${escHtml(review.reply_text || '')}</textarea>
-          </div>
-          <div class="form-group full" style="border-top: 1px solid var(--beige3); padding-top: 1rem; margin-top: 0.5rem;">
-            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;">
-              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
-                <input type="checkbox" id="review-approved" ${isApproved ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
-                <span style="font-size: 0.9rem;">Approve & Show on Site</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
-                <input type="checkbox" id="review-featured" ${isPinned ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
-                <span style="font-size: 0.9rem;">Feature on Homepage</span>
-              </label>
-            </div>
-          </div>
-        </div>
-      `,
-      confirmLabel: isEdit ? 'Save Changes' : 'Add Review',
-      cancelLabel: 'Cancel',
-      showDeleteBtn: isEdit,
-      onConfirm: async function () {
-        const name = document.getElementById('review-name')?.value.trim() || '';
-        const company = document.getElementById('review-company')?.value.trim() || '';
-        const location = document.getElementById('review-location')?.value.trim() || '';
-        const rating = parseInt(document.getElementById('review-rating')?.value, 10) || 5;
-        const reviewText = document.getElementById('review-text')?.value.trim() || '';
-        const replyText = document.getElementById('review-reply-text')?.value.trim() || null;
-        const isApprovedCheckbox = document.getElementById('review-approved')?.checked ?? (_editingId ? review.is_approved : false);
-        const isFeaturedCheckbox = document.getElementById('review-featured')?.checked ?? (_editingId ? review.is_pinned : false);
-
-        if (!name) {
-          showToastSafe('error', 'Please enter the client name.');
-          return;
-        }
-        if (!company) {
-          showToastSafe('error', 'Please enter the company name.');
-          return;
-        }
-        if (!location) {
-          showToastSafe('error', 'Please enter the location.');
-          return;
-        }
-        if (!reviewText) {
-          showToastSafe('error', 'Please enter the review text.');
-          return;
-        }
-
-        // Get avatar URL
-        let avatarUrl = document.querySelector('input[name="review-avatar"]:checked')?.value || null;
-        const avatarPreviewEl = document.getElementById('avatar-image-preview');
-        if (avatarPreviewEl && avatarPreviewEl.classList.contains('active') && avatarPreviewEl.src.startsWith('data:')) {
-          avatarUrl = avatarPreviewEl.src;
-        } else if (isEdit && !isPreset) {
-          avatarUrl = review.avatar_url;
-        }
-
-        // Get project work photo
-        let workImage = '';
-        const workPreviewEl = document.getElementById('work-image-preview');
         if (workPreviewEl && workPreviewEl.classList.contains('active') && workPreviewEl.src.startsWith('data:')) {
           workImage = workPreviewEl.src;
         } else if (isEdit) {

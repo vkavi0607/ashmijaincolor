@@ -1819,6 +1819,35 @@ function initDynamicBackground() {
 
 window.initDynamicBackground = initDynamicBackground;
 
+/**
+ * Generates an SVG monogram (initials) as a data URL for use as an avatar.
+ * Uses the brand gold colour palette.
+ * @param {string} name - The reviewer's full name
+ * @returns {string} SVG data URL
+ */
+function generateMonogram(name) {
+  const words = String(name || 'A').trim().split(/\s+/);
+  const initials = words.length >= 2
+    ? (words[0][0] + words[words.length - 1][0]).toUpperCase()
+    : (words[0][0] || 'A').toUpperCase();
+
+  const COLOURS = [
+    ['#b8933a', '#f7f3eb'],
+    ['#8b4a2f', '#fff8f0'],
+    ['#6b7c6b', '#f4f8f4'],
+    ['#3a3530', '#f5f0e8'],
+    ['#9b6b21', '#fffaf0'],
+  ];
+  const idx = (initials.charCodeAt(0) + (initials.charCodeAt(1) || 0)) % COLOURS.length;
+  const [bg, fg] = COLOURS[idx];
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150">
+    <circle cx="75" cy="75" r="75" fill="${bg}"/>
+    <text x="75" y="75" dy="0.35em" text-anchor="middle" font-family="Playfair Display, Georgia, serif" font-size="56" font-weight="600" fill="${fg}" letter-spacing="2">${initials}</text>
+  </svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 const FALLBACK_TESTIMONIALS = [
   {
     id: 0,
@@ -1947,7 +1976,8 @@ async function loadTestimonials() {
         role: roleText || 'Client',
         quote: cleanText || '',
         image: workImage || DEFAULT_TESTIMONIAL_IMAGE,
-        avatar: item.avatar_url || DEFAULT_TESTIMONIAL_IMAGE,
+        avatar: item.avatar_url || null,
+        hasPhoto: !!item.avatar_url,
       };
     });
   } catch (err) {
@@ -1976,7 +2006,10 @@ async function init3DTestimonialCarousel() {
         <img src="${item.image}" alt="${item.name}'s artwork" class="t3d-artwork-img">
       </div>
       <div class="t3d-avatar-container">
-        <img src="${item.avatar}" alt="${item.name}" class="t3d-avatar-img">
+        ${item.hasPhoto
+          ? `<img src="${item.avatar}" alt="${item.name}" class="t3d-avatar-img">`
+          : `<img src="${generateMonogram(item.name)}" alt="${item.name}" class="t3d-avatar-img">`
+        }
       </div>
       <div class="t3d-content">
         <p class="testimonial-quote">“${item.quote}”</p>
@@ -2452,7 +2485,7 @@ function initRatingModal() {
         </div>
         <div class="testimonial-content">
           <div class="testimonial-avatar">
-            <img src="${review.avatar}" alt="${review.name}">
+            <img src="${review.hasPhoto ? review.avatar : generateMonogram(review.name)}" alt="${review.name}">
           </div>
           <h4 class="testimonial-name">${review.name}</h4>
           <span class="testimonial-company">${review.company}</span>
@@ -2664,14 +2697,14 @@ function initRatingModal() {
           }
         }
 
-        const avatar = document.querySelector('input[name="review-avatar"]:checked')?.value || '';
-        let avatarUrl = avatar;
+        // Avatar: use uploaded photo if provided, otherwise leave null (monogram will be shown on display)
+        let avatarUrl = null;
         const avatarFile = document.getElementById('review-avatar-file')?.files[0];
         if (avatarFile) {
           try {
             avatarUrl = await compressImage(avatarFile);
           } catch (avatarCompressErr) {
-            
+            console.warn('[review] Could not compress avatar image', avatarCompressErr);
           }
         }
 
