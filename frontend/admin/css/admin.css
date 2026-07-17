@@ -54,7 +54,7 @@ body {
   position: fixed;
   top: 0; left: 0;
   width: var(--sidebar-w);
-  height: 100vh;
+  height: 100dvh;
   background: var(--ink);
   display: flex;
   flex-direction: column;
@@ -224,7 +224,7 @@ body {
 
 .admin-main {
   margin-left: var(--sidebar-w);
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   transition: margin-left var(--transition);
@@ -1198,6 +1198,7 @@ tbody td {
   position: fixed;
   inset: 0;
   z-index: 8000;
+  height: 100dvh;
   background: rgba(28,26,23,0.55);
   display: flex;
   align-items: center;
@@ -1948,7 +1949,7 @@ tr.sortable-ghost  { opacity: 0.35; }
   .modal-card {
     width: 100%;
     max-width: none;
-    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
     border-radius: var(--radius-md);
   }
 
