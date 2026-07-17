@@ -37,45 +37,6 @@
         details,
         user_id: userId,
         created_at: new Date().toISOString(),
-'use strict';
-
-(function () {
-  const ADMIN_SECTION_ID = 'section-reviews';
-  const TABLE_NAME = 'reviews';
-
-  let _reviews = [];
-  let _searchTimer = null;
-  let _editingId = null;
-  let _schemaWarningShown = false;
-
-  function getDb() {
-    return window.db || null;
-  }
-
-  function showToastSafe(type, message) {
-    if (typeof window.showToast === 'function') {
-      window.showToast(message, type);
-      return;
-    }
-    console[type === 'error' ? 'error' : 'log'](`[reviews] ${message}`);
-  }
-
-  async function logAudit(module, action, details = {}) {
-    if (typeof window.logAudit === 'function') {
-      return window.logAudit(module, action, details);
-    }
-
-    try {
-      const db = getDb();
-      if (!db) return;
-      const { data: { session } = {} } = await db.auth.getSession();
-      const userId = session?.user?.id ?? null;
-      await db.from('audit_log').insert({
-        module,
-        action,
-        details,
-        user_id: userId,
-        created_at: new Date().toISOString(),
       });
     } catch (err) {
       console.warn('[reviews] audit failed', err);
@@ -188,7 +149,7 @@
 
   function buildReviewRow(review) {
     const name = escHtml(review.name || 'Unnamed client');
-    const company = escHtml(review.company || '—');
+    const company = escHtml(review.company || 'ΓÇö');
     const rating = buildStars(review.rating);
     const featured = review.is_pinned ? 'Yes' : 'No';
     const statusBadge = review.is_approved
@@ -196,9 +157,9 @@
       : `<span class="badge" style="background: rgba(255, 193, 7, 0.15); color: #b8860b; padding: 4px 8px; border-radius: 12px; font-weight: 500; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px;"><i class="ti ti-clock"></i> Pending</span>`;
     const sortValue = formatDate(review.created_at);
     const parsedReview = parseReviewText(review.review_text);
-    const locationValue = escHtml(review.location || parsedReview.location || '—');
+    const locationValue = escHtml(review.location || parsedReview.location || 'ΓÇö');
     const reviewText = escHtml(String(parsedReview.text || ''));
-    const previewText = reviewText.length > 80 ? `${reviewText.slice(0, 80)}…` : reviewText || '—';
+    const previewText = reviewText.length > 80 ? `${reviewText.slice(0, 80)}ΓÇª` : reviewText || 'ΓÇö';
 
     const approvalBtn = review.is_approved
       ? `<button class="btn btn-ghost btn-sm btn-toggle-approval" data-id="${review.id}" title="Hide from Site" style="color: var(--muted);">
@@ -210,9 +171,7 @@
 
     return `
       <tr data-id="${review.id}">
-        <td style="text-align:center;">
-          <img src="${review.avatar_url || generateMonogram(review.name || 'A')}" alt="${escHtml(review.name)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(184,147,58,0.3);">
-        </td>
+        <td style="text-align:center;"><img src="${review.avatar_url || generateMonogram(review.name || 'A')}" alt="${escHtml(review.name)}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(184,147,58,0.3);"></td>
         <td style="text-align:center;">${rating}</td>
         <td>${name}</td>
         <td>${company}</td>
@@ -336,7 +295,7 @@
       bodyHTML: `
         <div class="form-grid">
           <div class="form-group full">
-            <label class="form-label" for="review-avatar-file">Client Photo <span style="font-weight:300;font-size:0.82rem;color:var(--muted);">(optional — if not uploaded, initials will be shown)</span></label>
+            <label class="form-label">Client Photo <span style="font-weight:300;font-size:0.82rem;color:var(--muted);">(optional — if not uploaded, initials will be shown)</span></label>
             <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:0.5rem;">
               <img id="avatar-image-preview" src="${review.avatar_url || generateMonogram(review.name || 'A')}" style="border-radius:50%;width:64px;height:64px;object-fit:cover;border:2px solid rgba(184,147,58,0.35);flex-shrink:0;" alt="Avatar preview">
               <input class="form-input" type="file" id="review-avatar-file" accept="image/*" style="flex:1;" />
@@ -373,6 +332,74 @@
                 <label>Vertical <input type="range" id="work-image-crop-y" min="0" max="100" value="50"></label>
               </div>
               <p style="margin: 8px 0 0; font-size: 0.78rem; color: var(--muted);">Drag the image to position the crop, or use the controls. The cropped image below will be saved.</p>
+            </div>
+            <div style="text-align: center; margin-top: 8px;">
+              <img id="work-image-preview" class="review-modal-upload-preview${parseReviewText(review.review_text).workImage ? ' active' : ''}" src="${parseReviewText(review.review_text).workImage || ''}" style="max-width: 100%; height: 120px; border-radius: 8px; object-fit: cover; display: ${parseReviewText(review.review_text).workImage ? 'inline-block' : 'none'};" />
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label" for="review-reply-text">Owner Response / Reply</label>
+            <textarea class="form-input" id="review-reply-text" rows="3" placeholder="Write a response to this review...">${escHtml(review.reply_text || '')}</textarea>
+          </div>
+          <div class="form-group full" style="border-top: 1px solid var(--beige3); padding-top: 1rem; margin-top: 0.5rem;">
+            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
+                <input type="checkbox" id="review-approved" ${isApproved ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
+                <span style="font-size: 0.9rem;">Approve & Show on Site</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
+                <input type="checkbox" id="review-featured" ${isPinned ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
+                <span style="font-size: 0.9rem;">Feature on Homepage</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      `,
+      confirmLabel: isEdit ? 'Save Changes' : 'Add Review',
+      cancelLabel: 'Cancel',
+      showDeleteBtn: isEdit,
+      onConfirm: async function () {
+        const name = document.getElementById('review-name')?.value.trim() || '';
+        const company = document.getElementById('review-company')?.value.trim() || '';
+        const location = document.getElementById('review-location')?.value.trim() || '';
+        const rating = parseInt(document.getElementById('review-rating')?.value, 10) || 5;
+        const reviewText = document.getElementById('review-text')?.value.trim() || '';
+        const replyText = document.getElementById('review-reply-text')?.value.trim() || null;
+        const isApprovedCheckbox = document.getElementById('review-approved')?.checked ?? (_editingId ? review.is_approved : false);
+        const isFeaturedCheckbox = document.getElementById('review-featured')?.checked ?? (_editingId ? review.is_pinned : false);
+
+        if (!name) {
+          showToastSafe('error', 'Please enter the client name.');
+          return;
+        }
+        if (!company) {
+          showToastSafe('error', 'Please enter the company name.');
+          return;
+        }
+        if (!location) {
+          showToastSafe('error', 'Please enter the location.');
+          return;
+        }
+        if (!reviewText) {
+          showToastSafe('error', 'Please enter the review text.');
+          return;
+        }
+
+        // Get avatar URL — use uploaded photo or null (monogram shown at display time)
+        let avatarUrl = null;
+        const avatarPreviewEl = document.getElementById('avatar-image-preview');
+        const avatarFileInput = document.getElementById('review-avatar-file');
+        if (avatarFileInput && avatarFileInput.files && avatarFileInput.files[0]) {
+          if (avatarPreviewEl && avatarPreviewEl.src && avatarPreviewEl.src.startsWith('data:')) {
+            avatarUrl = avatarPreviewEl.src;
+          }
+        } else if (isEdit && review.avatar_url) {
+          avatarUrl = review.avatar_url;
+        }
+
+        // Get project work photo
+        let workImage = '';
+        const workPreviewEl = document.getElementById('work-image-preview');
         if (workPreviewEl && workPreviewEl.classList.contains('active') && workPreviewEl.src.startsWith('data:')) {
           workImage = workPreviewEl.src;
         } else if (isEdit) {
@@ -451,6 +478,8 @@
       // Set up image file change listeners
       const avatarFileEl = document.getElementById('review-avatar-file');
       const avatarPreviewEl = document.getElementById('avatar-image-preview');
+      const nameInputEl = document.getElementById('review-name');
+      
       if (avatarFileEl && avatarPreviewEl) {
         avatarFileEl.addEventListener('change', async (e) => {
           const file = e.target.files[0];
@@ -458,13 +487,20 @@
             try {
               const compressed = await compressImage(file);
               avatarPreviewEl.src = compressed;
-              avatarPreviewEl.style.display = 'inline-block';
-              avatarPreviewEl.classList.add('active');
-              // Unselect preset avatars
-              document.querySelectorAll('.rating-avatar').forEach(label => label.classList.remove('selected'));
-              document.querySelectorAll('input[name="review-avatar"]').forEach(input => input.checked = false);
             } catch (err) {
               console.warn('Failed to compress avatar image', err);
+            }
+          } else {
+             avatarPreviewEl.src = review.avatar_url || generateMonogram(nameInputEl ? nameInputEl.value : 'A');
+          }
+        });
+      }
+
+      if (nameInputEl && avatarPreviewEl && avatarFileEl) {
+        nameInputEl.addEventListener('input', () => {
+          if (!avatarFileEl.files || avatarFileEl.files.length === 0) {
+            if (!review.avatar_url) {
+              avatarPreviewEl.src = generateMonogram(nameInputEl.value || 'A');
             }
           }
         });
