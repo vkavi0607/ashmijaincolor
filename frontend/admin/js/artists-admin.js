@@ -830,7 +830,7 @@
         <p><strong>Click to browse</strong> or drag &amp; drop a photo</p>
         <p style="font-size:0.73rem;margin-top:4px;opacity:0.75;">JPG, PNG, WEBP — max 8 MB</p>
       </div>
-      <img id="ar-img-preview" class="ar-img-preview hidden" alt="Preview">
+      <img id="ar-img-preview" class="ar-img-preview hidden" alt="Creator avatar preview">
       <input type="file" id="ar-file-input" accept="image/*" style="display:none;" aria-hidden="true">
 
       <!-- Fields -->

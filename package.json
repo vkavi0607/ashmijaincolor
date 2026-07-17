@@ -1,0 +1,26 @@
+{
+  "name": "ashmijaincolor",
+  "version": "1.0.0",
+  "description": "Welcome to the official codebase for **ashmija in color** — South Asia's premium custom mural and hand-painted wall art collective.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vkavi0607/ashmijaincolor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/vkavi0607/ashmijaincolor/issues"
+  },
+  "homepage": "https://github.com/vkavi0607/ashmijaincolor#readme",
+  "devDependencies": {
+    "eslint": "^10.7.0",
+    "prettier": "^3.9.5",
+    "sharp": "^0.35.3"
+  }
+}

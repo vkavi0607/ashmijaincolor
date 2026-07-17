@@ -1,27 +1,5 @@
 'use strict';
 
-function updateScrollProgress() {
-  const fill = document.querySelector('.scroll-progress-fill');
-  if (!fill) return;
-  const scrollTop = window.scrollY || window.pageYOffset;
-  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-  const progress = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
-  fill.style.width = `${progress}%`;
-}
-
-let progressTicking = false;
-window.addEventListener('scroll', () => {
-  if (!progressTicking) {
-    progressTicking = true;
-    requestAnimationFrame(() => {
-      updateScrollProgress();
-      progressTicking = false;
-    });
-  }
-});
-
-window.addEventListener('load', updateScrollProgress);
-
 // Scroll reveal observer
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
@@ -1439,7 +1417,7 @@ async function init3DGallery() {
 
   await loadPortfolioIntoGallery();
 
-  let activeCategory = 'corporate';
+  let activeCategory = 'schools';
   let activeArtworkIndex = 0;
 
   let tiltX = 0;
@@ -1478,7 +1456,7 @@ async function init3DGallery() {
     if (track) {
       track.innerHTML = list.map((art, index) => `
         <div class="carousel-item" data-index="${index}">
-          <img src="${art.images.front}" alt="Mural Art" loading="lazy">
+          <img src="${art.images.front}" alt="${art.title} mural art" loading="lazy" decoding="async">
         </div>
       `).join('');
 
@@ -1506,7 +1484,7 @@ async function init3DGallery() {
       tagEl.textContent = activeCategory.replace('_', ' ');
       tagEl.style.textTransform = 'uppercase';
     }
-    
+
     if (titleEl) titleEl.textContent = art.title;
     if (artistEl) artistEl.textContent = art.artist;
     if (mediumEl) mediumEl.textContent = art.medium;
@@ -1514,18 +1492,34 @@ async function init3DGallery() {
     if (dimsEl) dimsEl.textContent = art.dims;
     if (descEl) descEl.textContent = art.desc;
 
-    // Update image
+    const isMobile = window.innerWidth <= 768;
+
     if (imgEl) {
-      imgEl.src = art.images.front;
-      imgEl.alt = art.title;
+      const applyImage = () => {
+        imgEl.src = art.images.front;
+        imgEl.alt = art.title;
+        imgEl.style.opacity = '1';
+      };
+
+      imgEl.style.opacity = '0.7';
+      const nextImage = new Image();
+      nextImage.onload = () => applyImage();
+      nextImage.onerror = () => applyImage();
+      nextImage.src = art.images.front;
+      if (nextImage.complete) {
+        applyImage();
+      }
     }
 
-    // Animate room update
-    if (frameEl && typeof gsap !== 'undefined') {
-      gsap.fromTo(frameEl, 
-        { scale: 0.9, opacity: 0, rotationY: -15 }, 
-        { scale: 1, opacity: 1, rotationY: 0, duration: 0.7, ease: "power3.out" }
+    if (frameEl && typeof gsap !== 'undefined' && !isMobile) {
+      gsap.fromTo(frameEl,
+        { scale: 0.9, opacity: 0, rotationY: -15 },
+        { scale: 1, opacity: 1, rotationY: 0, duration: 0.7, ease: 'power3.out' }
       );
+    } else if (frameEl) {
+      frameEl.style.opacity = '1';
+      frameEl.style.transform = 'none';
+      frameEl.style.scale = '1';
     }
 
     updateCoverflow();
@@ -1533,10 +1527,11 @@ async function init3DGallery() {
 
   // Update Coverflow position & 3D styling
   function updateCoverflow() {
+    const isMobile = window.innerWidth <= 768;
     const items = document.querySelectorAll('.carousel-item');
     items.forEach((item, idx) => {
       item.classList.toggle('active', idx === activeArtworkIndex);
-      
+
       const offset = idx - activeArtworkIndex;
       let transformStr = '';
       let opacityVal = 0.5;
@@ -1544,19 +1539,23 @@ async function init3DGallery() {
       let zIndexVal = 5 - Math.abs(offset);
 
       if (offset === 0) {
-        transformStr = 'translate3d(0, 0, 80px) rotateY(0deg)';
+        transformStr = isMobile ? 'translate3d(0, 0, 0) rotateY(0deg)' : 'translate3d(0, 0, 80px) rotateY(0deg)';
         opacityVal = 1;
-        filterStr = 'brightness(1) blur(0)';
+        filterStr = isMobile ? 'none' : 'brightness(1) blur(0)';
         zIndexVal = 10;
       } else if (offset < 0) {
-        transformStr = `translate3d(${offset * 110 - 40}px, 0, 10px) rotateY(25deg)`;
+        transformStr = isMobile
+          ? `translate3d(${offset * 95 - 26}px, 0, 0) rotateY(16deg)`
+          : `translate3d(${offset * 110 - 40}px, 0, 10px) rotateY(25deg)`;
       } else {
-        transformStr = `translate3d(${offset * 110 + 40}px, 0, 10px) rotateY(-25deg)`;
+        transformStr = isMobile
+          ? `translate3d(${offset * 95 + 26}px, 0, 0) rotateY(-16deg)`
+          : `translate3d(${offset * 110 + 40}px, 0, 10px) rotateY(-25deg)`;
       }
 
       item.style.transform = transformStr;
       item.style.opacity = opacityVal;
-      item.style.filter = filterStr;
+      item.style.filter = isMobile ? 'none' : filterStr;
       item.style.zIndex = zIndexVal;
     });
   }
@@ -1644,10 +1643,10 @@ async function init3DGallery() {
       lightbox.removeAttribute('hidden');
       document.body.style.overflow = 'hidden';
 
-      if (lightboxFrame && typeof gsap !== 'undefined') {
+      if (lightboxFrame && typeof gsap !== 'undefined' && window.innerWidth > 768) {
         gsap.fromTo(lightboxFrame,
           { scale: 0.85, opacity: 0, rotationY: 0, rotationX: 0 },
-          { scale: 1, opacity: 1, duration: 0.5, ease: "power2.out" }
+          { scale: 1, opacity: 1, duration: 0.5, ease: 'power2.out' }
         );
       }
     });
@@ -1685,7 +1684,7 @@ async function init3DGallery() {
       lightboxRotY = targetRotY;   // Save the selected Y rotation
       lightboxRotX = targetRotX;   // Save the selected X rotation
 
-      if (lightboxFrame && typeof gsap !== 'undefined') {
+      if (lightboxFrame && typeof gsap !== 'undefined' && window.innerWidth > 768) {
         // Set image source directly to avoid blank/blink screen state during transition
         if (lightboxImg) {
           lightboxImg.src = imgUrl;
@@ -1697,7 +1696,7 @@ async function init3DGallery() {
           rotationX: targetRotX,
           scale: targetScale,
           duration: 0.5,
-          ease: "power2.out"
+          ease: 'power2.out'
         });
       } else {
         // Fallback
@@ -1728,7 +1727,7 @@ async function init3DGallery() {
     });
     
     lightbox.addEventListener('mouseleave', () => {
-      if (lightboxFrame && typeof gsap !== 'undefined') {
+      if (lightboxFrame && typeof gsap !== 'undefined' && window.innerWidth > 768) {
         // Reset tilt but retain the active angle's base rotation and scale
         gsap.to(lightboxFrame, { rotateY: lightboxRotY, rotateX: lightboxRotX, scale: lightboxScale, duration: 0.5 });
       }
@@ -1974,7 +1973,7 @@ async function init3DTestimonialCarousel() {
     <div class="testimonial-3d-card" data-index="${index}">
       <div class="t3d-shine"></div>
       <div class="t3d-artwork-container">
-        <img src="${item.image}" alt="Artwork design" class="t3d-artwork-img">
+        <img src="${item.image}" alt="${item.name}'s artwork" class="t3d-artwork-img">
       </div>
       <div class="t3d-avatar-container">
         <img src="${item.avatar}" alt="${item.name}" class="t3d-avatar-img">
@@ -2043,13 +2042,15 @@ async function init3DTestimonialCarousel() {
 
     card.addEventListener('mouseleave', () => {
       if (parseInt(card.getAttribute('data-index'), 10) !== activeIndex) return;
-      gsap.to(card, {
-        duration: 0.5,
-        rotationX: 0,
-        rotationY: 0,
-        y: 0,
-        ease: "power2.out"
-      });
+      if (window.innerWidth > 768) {
+        gsap.to(card, {
+          duration: 0.5,
+          rotationX: 0,
+          rotationY: 0,
+          y: 0,
+          ease: 'power2.out'
+        });
+      }
       const shine = card.querySelector('.t3d-shine');
       if (shine) {
         shine.style.background = 'none';
@@ -2121,31 +2122,41 @@ async function init3DTestimonialCarousel() {
         card.classList.remove('is-active');
       }
 
-      // Smooth GSAP transition
-      gsap.to(card, {
-        duration: 0.8,
-        ease: "cubic-bezier(0.22, 1, 0.36, 1)",
-        x: xOffset,
-        z: zOffset,
-        rotationY: rotation,
-        y: yOffset,
-        scale: scale,
-        opacity: opacity,
-        zIndex: zIndex,
-        filter: blur > 0 && !isMobile ? `blur(${blur}px)` : 'none',
-        overwrite: "auto"
-      });
+      if (isMobile) {
+        card.style.transition = 'transform 0.25s ease, opacity 0.25s ease, filter 0.25s ease';
+        card.style.transform = `translate3d(${xOffset}px, ${yOffset}px, ${zOffset}px) rotateY(${rotation}deg) scale(${scale})`;
+        card.style.opacity = opacity;
+        card.style.zIndex = zIndex;
+        card.style.filter = 'none';
+      } else {
+        gsap.to(card, {
+          duration: 0.8,
+          ease: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          x: xOffset,
+          z: zOffset,
+          rotationY: rotation,
+          y: yOffset,
+          scale: scale,
+          opacity: opacity,
+          zIndex: zIndex,
+          filter: blur > 0 ? `blur(${blur}px)` : 'none',
+          overwrite: 'auto'
+        });
+      }
 
-      // Artwork image parallax
       const img = card.querySelector('.t3d-artwork-img');
       if (img) {
-        let imgX = -diff * 20;
-        gsap.to(img, {
-          duration: 0.8,
-          ease: "cubic-bezier(0.22, 1, 0.36, 1)",
-          x: imgX,
-          overwrite: "auto"
-        });
+        const imgX = isMobile ? 0 : -diff * 20;
+        if (isMobile) {
+          img.style.transform = 'translate3d(0, 0, 0)';
+        } else {
+          gsap.to(img, {
+            duration: 0.8,
+            ease: 'cubic-bezier(0.22, 1, 0.36, 1)',
+            x: imgX,
+            overwrite: 'auto'
+          });
+        }
       }
     });
 
@@ -2255,7 +2266,11 @@ async function init3DTestimonialCarousel() {
   }
 
   // Resize handler
-  window.addEventListener('resize', updateCarousel);
+  let resizeFrame = null;
+  window.addEventListener('resize', () => {
+    if (resizeFrame) cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(updateCarousel);
+  });
 
   // Initialize
   updateCarousel();
@@ -2372,7 +2387,7 @@ if (btnCreatorsMore) {
 
     const section = document.getElementById('artists-section');
     if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      section.scrollIntoView({ block: 'start' });
     }
   });
 }
@@ -2595,7 +2610,6 @@ function initRatingModal() {
   if (reviewForm) {
     reviewForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-      console.log('[review-form] submit event fired');
 
       if (mlReplyEl) {
         mlReplyEl.style.display = 'none';
@@ -2614,7 +2628,9 @@ function initRatingModal() {
       const reviewText = formData.get('reviewText').trim();
 
       if (!name || !company || !reviewText) {
-        alert('Please complete the required fields before submitting your review.');
+        const msg = 'Please complete the required fields before submitting your review.';
+        if (window.showToast) window.showToast(msg, 'warning');
+        else alert(msg);
         return;
       }
 
@@ -2644,7 +2660,7 @@ function initRatingModal() {
           try {
             workImage = await compressImage(workImageFile);
           } catch (compressErr) {
-            console.warn('[review-form] image compression failed, proceeding without it:', compressErr);
+            
           }
         }
 
@@ -2655,14 +2671,14 @@ function initRatingModal() {
           try {
             avatarUrl = await compressImage(avatarFile);
           } catch (avatarCompressErr) {
-            console.warn('[review-form] avatar image compression failed, falling back to selected avatar:', avatarCompressErr);
+            
           }
         }
 
         let mlReplyText = null;
         let mlReplyEmoji = null;
         let mlReplySticker = null;
-        let mlError = null;
+        
         try {
           const mlApiUrl = window.appConfig.ML_REPLY_FUNCTION_URL;
           const mlResponse = await fetch(mlApiUrl, {
@@ -2680,15 +2696,15 @@ function initRatingModal() {
 
           if (mlResponse.ok) {
             const mlData = await mlResponse.json();
-            console.log('[review-form] ML API response', mlData);
+            
             mlReplyText = mlData.reply || null;
             mlReplyEmoji = mlData.emoji || null;
             mlReplySticker = mlData.sticker || null;
           } else {
-            console.warn('[review-form] ML API returned status', mlResponse.status);
+            
           }
         } catch (mlErr) {
-          console.warn('[review-form] ML API call failed:', mlErr);
+          
         }
 
         // Fallback custom reply when ML API is not available
@@ -2724,9 +2740,9 @@ function initRatingModal() {
 
         try { 
           const { error } = await window.db.from('reviews').insert(payload);
-          if (error) console.error('Database insert error', error);
+          if (error) {}
         } catch(e) {
-          console.error('Database error, continuing...', e);
+          
         }
 
         const displayText = mlReplyText;
@@ -2784,12 +2800,14 @@ function initRatingModal() {
           }
         }
 
-        console.log('[review-form] mlReplyText=', mlReplyText, 'mlError=', mlError);
+        
         reviewForm.reset();
         updateAvatarSelection(document.querySelector('input[name="review-avatar"]'));
       } catch (err) {
-        console.error('[review-form] submit error:', err);
-        alert(err?.message ? `Could not process the review form: ${err.message}` : 'Could not process the review form.');
+        
+        const msg = err?.message ? `Could not process the review form: ${err.message}` : 'Could not process the review form.';
+        if (window.showToast) window.showToast(msg, 'error');
+        else alert(msg);
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -2850,7 +2868,9 @@ function initContactForm() {
     };
 
     if (!payload.firstName || !payload.lastName || !payload.email) {
-      alert('Please complete your name and email before sending.');
+      const msg = 'Please complete your name and email before sending.';
+      if (window.showToast) window.showToast(msg, 'warning');
+      else alert(msg);
       return;
     }
 
@@ -2885,11 +2905,15 @@ function initContactForm() {
         formContainer.style.display = 'none';
         successState.style.display = 'flex';
       } else {
-        alert('Thank you! Your details have been sent.');
+        const msg = 'Thank you! Your details have been sent.';
+        if (window.showToast) window.showToast(msg, 'success');
+        else alert(msg);
       }
     } catch (err) {
       console.error('[contact-form] submit error:', err);
-      alert('Failed to send your message. Please try again.');
+      const msg = 'Failed to send your message. Please try again.';
+      if (window.showToast) window.showToast(msg, 'error');
+      else alert(msg);
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
@@ -2900,6 +2924,10 @@ function initContactForm() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Failsafe: Ensure scroll lock is released on initial load
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
+
   initContactForm();
   initRatingModal();
   init3DGallery();
@@ -3207,6 +3235,8 @@ function initScrollNavigation() {
    LUXURY EDITORIAL HERO REDESIGN — Magnetic Buttons
    ================================================================ */
 function initMagneticButtons() {
+  if (window.innerWidth <= 768) return;
+
   const buttons = document.querySelectorAll('#btn-hero-explore, #btn-hero-artists, .btn-primary, .btn-outline');
   if (!buttons.length) return;
 
@@ -3229,6 +3259,8 @@ function initMagneticButtons() {
    LUXURY EDITORIAL HERO REDESIGN — Scroll Parallax Mural
    ================================================================ */
 function initHeroParallax() {
+  if (window.innerWidth <= 768) return;
+
   const mural = document.querySelector('.hero-mural');
   if (!mural) return;
 
@@ -3245,23 +3277,38 @@ function initMobileNavigation() {
   const hamburger = document.getElementById('nav-hamburger-toggle');
   const overlay = document.getElementById('mobile-menu-overlay');
   const closeBtn = document.getElementById('mobile-menu-close-btn');
-  
+
   if (!hamburger || !overlay) return;
 
+  const setMenuState = (shouldOpen) => {
+    hamburger.classList.toggle('active', shouldOpen);
+    overlay.classList.toggle('active', shouldOpen);
+    hamburger.setAttribute('aria-expanded', String(shouldOpen));
+    overlay.setAttribute('aria-hidden', String(!shouldOpen));
+
+    document.documentElement.classList.toggle('menu-open', shouldOpen);
+    document.body.classList.toggle('menu-open', shouldOpen);
+    document.body.style.overflow = shouldOpen ? 'hidden' : '';
+    document.documentElement.style.overflow = shouldOpen ? 'hidden' : '';
+  };
+
+  const setActiveLink = (hash) => {
+    const links = overlay.querySelectorAll('.mobile-nav-link');
+    const target = hash && hash.startsWith('#') ? hash : '#portfolio-section';
+    links.forEach((link) => {
+      const matches = link.getAttribute('href') === target;
+      link.classList.toggle('is-active', matches);
+    });
+  };
+
   const openMenu = () => {
-    hamburger.classList.add('active');
-    overlay.classList.add('active');
-    hamburger.setAttribute('aria-expanded', 'true');
-    overlay.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
+    setMenuState(true);
+    const currentHash = window.location.hash || '#portfolio-section';
+    setActiveLink(currentHash);
   };
 
   const closeMenu = () => {
-    hamburger.classList.remove('active');
-    overlay.classList.remove('active');
-    hamburger.setAttribute('aria-expanded', 'false');
-    overlay.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
+    setMenuState(false);
   };
 
   hamburger.addEventListener('click', () => {
@@ -3277,9 +3324,18 @@ function initMobileNavigation() {
     closeBtn.addEventListener('click', closeMenu);
   }
 
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) {
+      closeMenu();
+    }
+  });
+
   const links = overlay.querySelectorAll('.mobile-nav-link');
-  links.forEach(link => {
-    link.addEventListener('click', closeMenu);
+  links.forEach((link) => {
+    link.addEventListener('click', () => {
+      setActiveLink(link.getAttribute('href'));
+      closeMenu();
+    });
   });
 
   window.addEventListener('keydown', (e) => {
@@ -3287,6 +3343,8 @@ function initMobileNavigation() {
       closeMenu();
     }
   });
+
+  setActiveLink(window.location.hash || '#portfolio-section');
 }
 
 /* ================================================================
@@ -3407,30 +3465,44 @@ function initTeamAnimations() {
       if (entry.isIntersecting) {
         // Heading character reveal
         if (typeof gsap !== 'undefined') {
-          gsap.to(section.querySelectorAll('.char-reveal'), {
-            opacity: 1,
-            y: 0,
-            stagger: 0.03,
-            duration: 0.6,
-            ease: "power2.out"
-          });
-          
-          gsap.fromTo(section.querySelector('.sec-title-sub'),
-            { opacity: 0, y: 15 },
-            { opacity: 1, y: 0, duration: 0.8, delay: 0.3, ease: "power2.out" }
-          );
+          // Only animate char-reveal spans if any exist
+          const charEls = section.querySelectorAll('.char-reveal');
+          if (charEls.length > 0) {
+            gsap.to(charEls, {
+              opacity: 1,
+              y: 0,
+              stagger: 0.03,
+              duration: 0.6,
+              ease: 'power2.out'
+            });
+          }
 
-          // Card reveal (fade up, scale from 0.96, stagger)
-          gsap.fromTo(section.querySelectorAll('.creator-card'),
-            { opacity: 0, y: 50, scale: 0.96 },
-            { opacity: 1, y: 0, scale: 1, duration: 0.85, stagger: 0.18, delay: 0.15, ease: "power3.out" }
-          );
+          // Only animate subtitle if it exists
+          const subTitle = section.querySelector('.sec-title-sub');
+          if (subTitle) {
+            gsap.fromTo(subTitle,
+              { opacity: 0, y: 15 },
+              { opacity: 1, y: 0, duration: 0.8, delay: 0.3, ease: 'power2.out' }
+            );
+          }
 
-          // Social icons fade in
-          gsap.fromTo(section.querySelectorAll('.creator-card-social .social-icon'),
-            { opacity: 0, scale: 0.7 },
-            { opacity: 1, scale: 1, duration: 0.45, stagger: 0.06, delay: 0.6, ease: "back.out(1.6)" }
-          );
+          // Card reveal — only if cards exist
+          const cards = section.querySelectorAll('.creator-card');
+          if (cards.length > 0) {
+            gsap.fromTo(cards,
+              { opacity: 0, y: 50, scale: 0.96 },
+              { opacity: 1, y: 0, scale: 1, duration: 0.85, stagger: 0.18, delay: 0.15, ease: 'power3.out' }
+            );
+          }
+
+          // Social icons — only if they exist
+          const socialIcons = section.querySelectorAll('.creator-card-social .social-icon');
+          if (socialIcons.length > 0) {
+            gsap.fromTo(socialIcons,
+              { opacity: 0, scale: 0.7 },
+              { opacity: 1, scale: 1, duration: 0.45, stagger: 0.06, delay: 0.6, ease: 'back.out(1.6)' }
+            );
+          }
         } else {
           // Fallback if GSAP is not loaded
           section.querySelectorAll('.char-reveal').forEach(el => el.style.opacity = 1);

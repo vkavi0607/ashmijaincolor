@@ -41,6 +41,8 @@
   let _searchTimer  = null;     // debounce handle for search input
   let _editingId    = null;     // UUID of item being edited (null = new)
   let _modalFile    = null;     // File object selected in modal
+  let _originalModalFile = null; // original File before cropping/compression
+  let _cropper = null;          // Cropper.js instance
   let _bulkSelected = new Set();// UUIDs checked for bulk ops
 
   function isMissingTableError(err) {
@@ -315,6 +317,56 @@
         gap: 0 16px;
       }
       .pf-form-grid .form-group.full { grid-column: 1 / -1; }
+
+      /* Cropper modal — rendered at document.body level with ultra-high z-index to prevent stacking context issues */
+      .aw-cropper-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+      }
+      .aw-cropper-modal.visible {
+        display: flex;
+      }
+      .aw-cropper-card {
+        background: var(--surface);
+        border-radius: 8px;
+        padding: 16px;
+        width: min(92vw, 920px);
+        max-height: 90vh;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+      }
+      .aw-cropper-header {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--ink1);
+      }
+      .aw-cropper-image-container {
+        flex: 1;
+        overflow: auto;
+        margin-bottom: 8px;
+        background: #1a1a1a;
+        border-radius: 4px;
+      }
+      .aw-cropper-canvas {
+        width: 100%;
+        max-height: 72vh;
+        display: block;
+        background: #111;
+      }
+      .aw-cropper-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
 
       /* Empty state within grid */
       #portfolio-grid-empty {
@@ -865,12 +917,12 @@
     const v = val => item ? escHtml(item[val] || '') : '';
     const selectedCategory = item?.category || '';
     const categoryOptions = [
-      ['corporate', 'Corporate Offices'],
-      ['cafes', 'Cafés & Restaurants'],
       ['schools', 'Schools & Education'],
+      ['residential', 'Residential Interiors'],
+      ['cafes', 'Cafés & Restaurants'],
+      ['corporate', 'Corporate Offices'],
       ['hospitals', 'Hospitals & Clinics'],
       ['hotels', 'Hotels & Resorts'],
-      ['residential', 'Residential Interiors'],
       ['retail', 'Retail & Showrooms'],
       ['outdoor', 'Outdoor & Public Art'],
     ].map(([value, label]) => `<option value="${value}" ${selectedCategory === value ? 'selected' : ''}>${label}</option>`).join('');
@@ -882,7 +934,7 @@
         <p><strong>Click to browse</strong> or drag & drop an image</p>
         <p style="font-size:0.74rem;margin-top:4px;">JPG, PNG, WEBP — max 10 MB</p>
       </div>
-      <img id="modal-img-preview" class="pf-img-preview hidden" alt="Preview">
+      <img id="modal-img-preview" class="pf-img-preview hidden" alt="Selected artwork preview">
       <input type="file" id="modal-file-input" accept="image/*" style="display:none;" aria-hidden="true">
 
       <!-- Fields -->
@@ -998,6 +1050,23 @@
     preview.addEventListener('click', () => fileInput.click());
     preview.style.cursor = 'pointer';
     preview.title = 'Click to change image';
+
+    // Inject cropper modal if missing
+    injectCropperModal();
+
+    // Create Crop & Preview button (hidden by default)
+    let cropBtn = document.getElementById('pf-crop-btn');
+    if (!cropBtn) {
+      cropBtn = document.createElement('button');
+      cropBtn.type = 'button';
+      cropBtn.id = 'pf-crop-btn';
+      cropBtn.className = 'btn btn-ghost btn-sm';
+      cropBtn.style.marginTop = '8px';
+      cropBtn.style.display = 'none';
+      cropBtn.textContent = 'Crop & Preview';
+      preview.insertAdjacentElement('afterend', cropBtn);
+      cropBtn.addEventListener('click', () => openCropperModal());
+    }
   }
 
   async function compressImage(file, targetRatio = 1.5, maxWidth = 1200, quality = 0.82) {
@@ -1064,12 +1133,13 @@
   async function setModalFile (file) {
     const preview  = document.getElementById('modal-img-preview');
     const zone     = document.getElementById('modal-upload-zone');
-    
     if (zone && zone.style.display !== 'none') {
-      zone.innerHTML = `<i class="ti ti-loader ti-spin"></i><p>Optimizing...</p>`;
+      zone.innerHTML = `<i class="ti ti-loader ti-spin"></i><p>Preparing image…</p>`;
     }
 
-    _modalFile = await compressImage(file, 1.5);
+    // Keep original so user can crop before final compression
+    _originalModalFile = file;
+    _modalFile = null; // will be set after crop or on save (auto-compress)
 
     const reader = new FileReader();
     reader.onload = e => {
@@ -1080,11 +1150,177 @@
         zone.innerHTML = `
           <i class="ti ti-cloud-upload"></i>
           <p><strong>Click to browse</strong> or drag & drop an image</p>
-          <p style="font-size:0.74rem;margin-top:4px;">Auto-compressed before upload</p>
+          <p style="font-size:0.74rem;margin-top:4px;">Click "Crop & Preview" to adjust image or save to upload auto-compressed version.</p>
         `;
       }
+
+      // Show crop button when preview available
+      const cropBtn = document.getElementById('pf-crop-btn');
+      if (cropBtn) cropBtn.style.display = '';
     };
-    reader.readAsDataURL(_modalFile);
+    reader.readAsDataURL(file);
+  }
+
+  /* ================================================================
+     CROPPER MODAL (rendered at document.body for proper stacking)
+     Portal-style injection to prevent stacking context issues.
+     ================================================================ */
+  function injectCropperModal () {
+    if (document.getElementById('aw-cropper-modal')) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'aw-cropper-modal';
+    modal.className = 'aw-cropper-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'aw-cropper-title');
+    
+    modal.innerHTML = `
+      <div class="aw-cropper-card">
+        <div class="aw-cropper-header" id="aw-cropper-title">Crop Image</div>
+        <div class="aw-cropper-image-container">
+          <img id="aw-cropper-img" class="aw-cropper-canvas" alt="Image to be cropped for upload">
+        </div>
+        <div class="aw-cropper-actions">
+          <button type="button" id="aw-crop-cancel" class="btn btn-ghost btn-sm" aria-label="Cancel crop">
+            <i class="ti ti-x"></i> Cancel
+          </button>
+          <button type="button" id="aw-crop-apply" class="btn btn-primary btn-sm" aria-label="Apply crop">
+            <i class="ti ti-check"></i> Apply Crop
+          </button>
+        </div>
+      </div>`;
+
+    // Append directly to body (not nested in any modal)
+    document.body.appendChild(modal);
+
+    // Wire event handlers
+    const cancelBtn = document.getElementById('aw-crop-cancel');
+    const applyBtn = document.getElementById('aw-crop-apply');
+    
+    if (cancelBtn) cancelBtn.addEventListener('click', closeCropperModal);
+    if (applyBtn) applyBtn.addEventListener('click', applyCrop);
+
+    // Close on ESC key
+    modal.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeCropperModal();
+    });
+  }
+
+  function openCropperModal (file) {
+    injectCropperModal();
+    const modal = document.getElementById('aw-cropper-modal');
+    const imgEl = document.getElementById('aw-cropper-img');
+    if (!modal || !imgEl) return;
+
+    const sourceFile = file || _originalModalFile;
+    if (!sourceFile) return showToast('warning', 'No image', 'Please select an image first.');
+
+    // Load image into cropper
+    const reader = new FileReader();
+    reader.onload = () => {
+      imgEl.src = reader.result;
+
+      // Show modal overlay
+      modal.classList.add('visible');
+
+      // Destroy previous cropper if exists
+      if (_cropper) {
+        try {
+          _cropper.destroy();
+        } catch (e) {}
+      }
+
+      // Initialize Cropper.js with responsive options
+      _cropper = new Cropper(imgEl, {
+        viewMode: 1,              // Crop box is not freely moved
+        autoCropArea: 0.9,
+        responsive: true,
+        background: false,
+        guides: true,
+        center: true,
+        highlight: true,
+        cropBoxMovable: true,
+        cropBoxResizable: true,
+        toggleDragModeOnDblclick: true,
+        movable: true,
+        rotatable: false,
+        scalable: true,
+        zoomable: true,
+        wheelZoomRatio: 0.1,
+        data: {
+          x: 0,
+          y: 0,
+          width: imgEl.offsetWidth || 400,
+          height: imgEl.offsetHeight || 300,
+        },
+      });
+
+      // Trap focus within modal while open (accessibility)
+      modal.focus();
+    };
+    reader.readAsDataURL(sourceFile);
+  }
+
+  function closeCropperModal () {
+    const modal = document.getElementById('aw-cropper-modal');
+    if (!modal) return;
+
+    // Hide immediately
+    modal.classList.remove('visible');
+
+    // Destroy cropper instance
+    if (_cropper) {
+      try {
+        _cropper.destroy();
+      } catch (e) {
+        console.warn('[portfolio] cropper destroy warning:', e);
+      }
+      _cropper = null;
+    }
+
+    // Remove modal from DOM after animation (prevents stacking context leakage)
+    setTimeout(() => {
+      const el = document.getElementById('aw-cropper-modal');
+      if (el) el.remove();
+    }, 100);
+  }
+
+  async function applyCrop () {
+    if (!_cropper) return;
+    try {
+      const canvas = _cropper.getCroppedCanvas({ maxWidth: 2000, imageSmoothingQuality: 'high' });
+      if (!canvas) return showToast('error', 'Crop failed', 'Could not create cropped image.');
+
+      // Convert to blob + file
+      canvas.toBlob(async (blob) => {
+        if (!blob) return showToast('error', 'Crop failed', 'Could not create image blob.');
+        const baseName = (_originalModalFile && _originalModalFile.name) ? _originalModalFile.name.replace(/\.[^/.]+$/, '') : 'cropped';
+        const croppedFile = new File([blob], baseName + '_crop.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+
+        // Compress/canonize the cropped image to the target ratio/size
+        const finalFile = await compressImage(croppedFile, 1.5, 1600, 0.88);
+
+        // Set as modal file and update preview
+        _modalFile = finalFile;
+        _originalModalFile = null;
+
+        const preview = document.getElementById('modal-img-preview');
+        if (preview) {
+          preview.src = URL.createObjectURL(finalFile);
+          preview.classList.remove('hidden');
+        }
+
+        // Hide crop button
+        const cropBtn = document.getElementById('pf-crop-btn');
+        if (cropBtn) cropBtn.style.display = 'none';
+
+        closeCropperModal();
+      }, 'image/jpeg', 0.92);
+    } catch (err) {
+      console.error('[portfolio] applyCrop error:', err);
+      showToast('error', 'Crop failed', (err && err.message) || 'Could not apply crop.');
+    }
   }
 
   async function handleModalSave () {
@@ -1119,6 +1355,12 @@
         : null;
 
       /* Upload new image if one was picked */
+      // If user didn't crop but selected an original file, auto-compress now
+      if (!_modalFile && _originalModalFile) {
+        _modalFile = await compressImage(_originalModalFile, 1.5);
+        _originalModalFile = null;
+      }
+
       if (_modalFile) {
         const ext      = _modalFile.name.split('.').pop().toLowerCase();
         const filename = `${STORAGE_DIR}${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;

@@ -69,6 +69,4 @@
       console.warn('[logAudit] failed:', err);
     }
   };
-
-  console.log('[supabase-client.js] Supabase client initialized:', window.appConfig.SUPABASE_URL);
 })();

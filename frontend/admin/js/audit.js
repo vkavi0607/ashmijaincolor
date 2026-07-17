@@ -161,9 +161,8 @@
   function showToastSafe(type, msg) {
     if (typeof window.showToast === 'function') {
       window.showToast(msg, type);
-    } else {
-      console.log(`[audit] ${type}: ${msg}`);
     }
+    // Intentionally empty for production
   }
 
   // Expose init globally
