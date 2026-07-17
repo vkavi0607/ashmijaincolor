@@ -149,7 +149,7 @@
 
   function buildReviewRow(review) {
     const name = escHtml(review.name || 'Unnamed client');
-    const company = escHtml(review.company || 'ΓÇö');
+    const company = escHtml(review.company || '—');
     const rating = buildStars(review.rating);
     const featured = review.is_pinned ? 'Yes' : 'No';
     const statusBadge = review.is_approved
@@ -157,9 +157,9 @@
       : `<span class="badge" style="background: rgba(255, 193, 7, 0.15); color: #b8860b; padding: 4px 8px; border-radius: 12px; font-weight: 500; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px;"><i class="ti ti-clock"></i> Pending</span>`;
     const sortValue = formatDate(review.created_at);
     const parsedReview = parseReviewText(review.review_text);
-    const locationValue = escHtml(review.location || parsedReview.location || 'ΓÇö');
+    const locationValue = escHtml(review.location || parsedReview.location || '—');
     const reviewText = escHtml(String(parsedReview.text || ''));
-    const previewText = reviewText.length > 80 ? `${reviewText.slice(0, 80)}ΓÇª` : reviewText || 'ΓÇö';
+    const previewText = reviewText.length > 80 ? `${reviewText.slice(0, 80)}…` : reviewText || '—';
 
     const approvalBtn = review.is_approved
       ? `<button class="btn btn-ghost btn-sm btn-toggle-approval" data-id="${review.id}" title="Hide from Site" style="color: var(--muted);">
